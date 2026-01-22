@@ -20,6 +20,8 @@ We made a launcher to launch Redrose in QEMU. To run it, paste this into your te
 curl -sSSL https://raw.githubusercontent.com/redroselinux/redroselinux/refs/heads/main/src/redrose-launcher/main.py | python3
 ```
 
+Otherwise, download from the Releases tab.
+
 ## Development
 *this repo uses busybox. **the linuxImage file is here solely for the CI***. This will be moved to the car-coreutils-repo and downloaded in the Makefile.
 
