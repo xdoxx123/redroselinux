@@ -1,6 +1,11 @@
-# Redrose Linux
-
-[![CI](https://github.com/redroselinux/redroselinux/actions/workflows/makefile.yml/badge.svg)](https://github.com/redroselinux/redroselinux/actions/workflows/makefile.yml)
+<h1 align="center">
+  <img width="32" height="32" alt="image" src="https://github.com/user-attachments/assets/2ae22b1a-0162-43c7-b522-c741fabbb9fb" />
+  Redrose Linux
+  
+  [![Builds](https://img.shields.io/github/actions/workflow/status/redroselinux/redroselinux/makefile.yml?label=builds&labelColor=black&logo=github&logoColor=white)](https://github.com/redroselinux/redroselinux/actions/workflows/makefile.yml)
+  ![Stars](https://img.shields.io/github/stars/redroselinux/redroselinux?style=flat&labelColor=black)
+  ![GitHub downloads](https://img.shields.io/github/downloads/redroselinux/redroselinux/total?labelColor=black&logo=github)
+</h1>
 
 The repositories for Car or the website are available to view on this Github organization.
 This repo contains some prebuilts, as mentioned in below sections.
@@ -34,3 +39,8 @@ make
 ```
 
 This does all the magic, and even runs it in a VM.
+
+## Contact
+
+- mostypc7@gmail.com
+- [![Matrix Chat](https://img.shields.io/badge/Matrix-%23redrose__linux-green?logo=matrix&logoColor=white)](https://matrix.to/#/#redrose_linux:matrix.org) 
