@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/reboot.h>
 #include "tui.c"
@@ -57,6 +58,9 @@ int main() {
     // show main header
     clear();
     main_header();
+    set_text_color(YELLOW);
+    printf("Known issue: If you press ENTER during installation, it will likely fail. Please avoid doing so.\n\n");
+    set_text_color(RESET);
     enter_continue();
 
     // localization
@@ -69,16 +73,16 @@ int main() {
     // disk
     clear();
     char* drive = disk_header();
-    while (!(drive[0] == '/' &&
+    if (!(drive[0] == '/' &&
         drive[1] == 'd' &&
         drive[2] == 'e' &&
         drive[3] == 'v' &&
         drive[4] == '/')) {
-            clear();
-            set_text_color(RED);
-            printf("Pick a drive that starts with /dev/(your drive)\n");
-            set_text_color(RESET);
-            drive = disk_header();
+            char drivefixed[128];
+            snprintf(drivefixed, sizeof(drivefixed), 
+                "/dev/%s", drive
+            );
+            drive = drivefixed;
     }
     enter_continue();
 
@@ -127,6 +131,7 @@ int main() {
         
         if (run_installation_step(wipe_drive, drive, "Preparing the drive!", 1) < 0) return 0;
         if (run_installation_step(dd_drive, drive, "Writing ISO to drive!", 1) < 0) return 0;
+        if (run_installation_step(drive_patch, drive, "Patching GRUB config!", 0) < 0) return 0;
         
         print_step_header();
         if (gen_postinst_scripts(drive, username, userpassword, rootpassword, host_name) != 0) {
