@@ -5,7 +5,6 @@
   [![Builds](https://img.shields.io/github/actions/workflow/status/redroselinux/redroselinux/makefile.yml?label=builds)](https://github.com/redroselinux/redroselinux/actions/workflows/makefile.yml)
   ![Stars](https://img.shields.io/github/stars/redroselinux/redroselinux?style=flat)
   ![GitHub downloads](https://img.shields.io/github/downloads/redroselinux/redroselinux/total?logo=github)
-  [![wakatime](https://wakatime.com/badge/user/51ead081-8e1f-4c26-86d2-89d60785c2ed/project/cb6618ea-ea03-431f-8a61-1d31620ac998.svg?labelColor=black)](https://wakatime.com/badge/user/51ead081-8e1f-4c26-86d2-89d60785c2ed/project/cb6618ea-ea03-431f-8a61-1d31620ac998)
 </h1>
 
 The repositories for Car or the website are available to view on this Github organization.
