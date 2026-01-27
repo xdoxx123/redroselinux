@@ -13,6 +13,11 @@ This repo contains some prebuilts, as mentioned in below sections.
 - Car: https://github.com/redroselinux/car
 - Website: https://github.com/redroselinux/redroselinux.github.io
 
+<div align="center">
+  <img width="400" alt="image" src="https://github.com/user-attachments/assets/a24eb7f2-a3fd-41f2-ab44-f626b7108bda" />
+  <img width="400" alt="image" src="https://github.com/user-attachments/assets/19af0ebe-0873-4101-ac63-075c7157fc24" />
+</div>
+
 ## Download
 
 We made a launcher to launch Redrose in QEMU. To run it, paste this into your terminal:
