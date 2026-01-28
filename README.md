@@ -51,4 +51,3 @@ This does all the magic, and even runs it in a VM.
 ## Contact
 
 - mostypc7@gmail.com
-- [![Matrix Chat](https://img.shields.io/badge/Matrix-%23redrose__linux-green?logo=matrix&logoColor=white)](https://matrix.to/#/#redrose_linux:matrix.org) 
