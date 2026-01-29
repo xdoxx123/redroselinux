@@ -33,14 +33,8 @@ jobs:
             mtools \
             make
 
-      - name: Build installer
-        run: make installer
-
-      - name: Make initramfs
-        run: make initramfs
-
-      - name: Make .iso
-        run: make iso
+      - name: Build
+        run: make no-vm
 
       - name: Upload ISO artifact
         uses: actions/upload-artifact@v4
