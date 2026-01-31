@@ -94,36 +94,6 @@ int gen_postinst_scripts(
 }
 ```
 
-#### Header text for sections in the installer
-
-_Requires `src/installer/tui.c`_
-
-When you print a big header, first install `figlet` and run:
-
-```bash
-figlet Header
-```
-
-Now choose a color for your header. This just, adds a little variety to it, perhaps?
-- blue
-- red
-- yellow
-- green
-
-We will pick green for now.
-
-Now print it like this:
-
-```c
-set_text_color(GREEN);
-printf(
-    "the figlet text"
-    "h"
-);set_text_color(RESET);
-```
-
-For any \ in the string, you must replace it with \\ so it gets properly shown.
-
 ## Submitting PRs
 
 When you are submitting a PR, please, please explain what you did. I do not want a PR like:
