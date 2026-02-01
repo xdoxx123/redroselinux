@@ -13,6 +13,7 @@ This repo contains some prebuilts, as mentioned in below sections.
 - Car: https://github.com/redroselinux/car
 - Website: https://github.com/redroselinux/redroselinux.github.io
 - My video about Redrose: https://youtu.be/5E74TuwsnpI
+- Dev branch: https://github.com/mostypc123/redroselinux
 
 <div align="center">
   <img width="400" alt="image" src="https://github.com/user-attachments/assets/a24eb7f2-a3fd-41f2-ab44-f626b7108bda" />
