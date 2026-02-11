@@ -61,3 +61,8 @@ This does all the magic, and even runs it in a VM.
 ## Contact
 
 - **Email**: mostypc7@gmail.com
+
+## Random stats no one reads
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=redroselinux/redroselinux&type=date&legend=top-left)](https://www.star-history.com/#redroselinux/redroselinux&type=date&legend=top-left)
