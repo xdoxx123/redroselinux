@@ -21,6 +21,8 @@ Redrose Linux is an **independent, reproducible, EU-based and beatiful** Linux d
   <img width="400" alt="image" src="https://github.com/user-attachments/assets/19af0ebe-0873-4101-ac63-075c7157fc24" />
 </div>
 
+Yes, the Makefile is fancy because I opened Cursor for fun. You guessed it
+
 ## Download
 
 We made a launcher to launch Redrose in QEMU. To run it, paste this into your terminal:
