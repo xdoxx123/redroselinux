@@ -30,6 +30,8 @@ We made a launcher to launch Redrose in QEMU. To run it, paste this into your te
 curl -sSSL https://raw.githubusercontent.com/redroselinux/redroselinux/refs/heads/main/src/redrose-launcher/main.py | python3
 ```
 
+This uses the latest **release**.
+
 Otherwise, download from the Releases tab.
 
 ## Hardware Requirements
@@ -37,6 +39,23 @@ Otherwise, download from the Releases tab.
 The installer can run on a potato, litterally, it needs ~131.200005M RAM. I did not do any tests for CPU.
 
 ## Development
+### nightly
+To compile the nightly version, clone `mostypc123/redroselinux`. Because of the way it works, you must also run:
+
+```
+python3 copy_syslibs.py
+```
+
+and compile:
+
+```
+make
+```
+
+The instructions will be changed after the next release, watch for it.
+
+
+### stable
 *this repo uses busybox. **the linuxImage file is here solely for the CI***. This will be moved to the `car-coreutils-repo` and downloaded in the `Makefile`.
 
 To build Redrose Linux, first build a Linux kernel.
