@@ -9,11 +9,14 @@
 // it exports the other functions from tui.c and
 // backend.c. got nothing else to say
 //
-// was ai used in this file? no
+// was ai used in this file? yes
 
 void shutdown_computer() {
     set_text_color(YELLOW);
-    printf("If you are on a VM, after the VM restarts, pick \"Boot existing OS\"\n");
+    printf(
+        "If you are on a VM, after the VM restarts, pick \"Boot existing OS\"\n"
+        "You can also remove the CD-ROM from the VM.\n"
+    );
     set_text_color(RESET);
     enter_continue();
     sync(); // flush filesystem buffers
@@ -84,16 +87,12 @@ int main() {
     // disk
     clear();
     char* drive = disk_header();
-    if (!(drive[0] == '/' &&
-        drive[1] == 'd' &&
-        drive[2] == 'e' &&
-        drive[3] == 'v' &&
-        drive[4] == '/')) {
-            char drivefixed[128];
-            snprintf(drivefixed, sizeof(drivefixed),
-                "/dev/%s", drive
-            );
-            drive = drivefixed;
+    if (!drive) {
+        set_text_color(RED);
+        printf("No drive selected. Exiting installer.\n");
+        set_text_color(RESET);
+        enter_continue();
+        return 0;
     }
     enter_continue();
 
@@ -142,10 +141,11 @@ int main() {
     if (confirm[0] == 'y' || confirm[0] == '\n') {
         print_step_header();
 
-        if (run_installation_step(wipe_drive, drive, "Preparing the drive!", 1) < 0) return 0;
-        if (run_installation_step(iso_to_img, 0, "Converting to .img!", 0 < 0)) return 0;
-        if (run_installation_step(dd_drive, drive, "Writing ISO to drive!", 1) < 0) return 0;
-        // if (run_installation_step(drive_patch, drive, "Patching GRUB config!", 0) < 0) return 0;
+        if (run_installation_step(wipe_drive, drive, "Erasing the drive!", 1) < 0) return 0;
+        if (run_installation_step(makefs, drive, "Making filesystems and copying root!", 1) < 0) return 0;
+        if (run_installation_step(install_grub, drive, "Installing GRUB!", 0) < 0) return 0;
+        if (run_installation_step(patch, drive, "Running patches!", 0) < 0) return 0;
+        if (run_installation_step(localhost, host_name, "Setting hostname!", 0) < 0) return 0;
 
         print_step_header();
         if (gen_postinst_scripts(drive, username, userpassword, rootpassword, host_name) != 0) {

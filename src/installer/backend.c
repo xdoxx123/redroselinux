@@ -1,14 +1,17 @@
 #include <dirent.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
-#include <stdlib.h>
+#include <sys/mount.h>
+
 #include "common.h"
 
 // backend for installer.
 //
-// was ai used in this file? yes (functions: list_dev, partition_drive, format_partitions)
+// was ai used in this file? yes (functions: list_dev, partition_drive, format_partitions, no_drives_repl, makefs)
 
 char* get_partition(const char* drive, int partnum) {
     static char buf[64];
@@ -20,8 +23,42 @@ char* get_partition(const char* drive, int partnum) {
     return buf;
 }
 
+static void no_drives_repl(void) {
+    set_text_color(RED);
+    printf("- no drives found!\n");
+    set_text_color(RESET);
+    printf("enter exit to remove this shell and bypass the warning. enter docs if you believe you do have a drive. otherwise, you can repair through commands.\n");
+    while (1) {
+        set_text_color(GREEN);
+        printf("\n> ");
+        set_text_color(RESET);
+        char command[4096];
 
-int list_dev() {
+        if (!fgets(command, sizeof(command), stdin))
+            break;
+
+        command[strcspn(command, "\n")] = 0;
+
+        if (strcmp(command, "exit") == 0) {
+            break;
+        } else if (strcmp(command, "docs") == 0) {
+            printf("If you believe a drive is present, follow these steps:\n\n");
+
+            printf("1) Firmware / BIOS checks:\n");
+            printf("   - Reboot into firmware setup (BIOS/UEFI).\n");
+            printf("   - Ensure the drive is detected by the firmware.\n");
+            printf("   - Disable Intel RST / RAID / VMD and use AHCI mode.\n");
+            printf("   - For NVMe systems, disable VMD if enabled.\n\n");
+
+            printf("2) Virtual machines:\n");
+            printf("   - Ensure a virtual disk is attached to the VM.\n");
+        } else {
+            system(command);
+        }
+    }
+}
+
+int list_devices(char *drives[64], int max) {
     DIR *dir = opendir("/dev");
     if (!dir) {
         perror("opendir /dev");
@@ -55,10 +92,10 @@ int list_dev() {
         fclose(fp);
     }
 
+    int count = 0;
     struct dirent *entry;
-    int found = 0;
 
-    while ((entry = readdir(dir)) != NULL) {
+    while (count < max && (entry = readdir(dir)) != NULL) {
         const char *name = entry->d_name;
 
         if (!(strncmp(name, "sd", 2) == 0 ||
@@ -68,165 +105,158 @@ int list_dev() {
 
         if (cur_dev[0] && strstr(cur_dev, name))
             continue;
-        if (strstr(name, "/dev/")) {
-            printf("- %s\n", name);
-        } else {
-            printf("- /dev/%s\n", name);
-        }
-        found++;
+
+        char *path = malloc(32);
+        if (!path)
+            break;
+        snprintf(path, 32, "/dev/%s", name);
+        drives[count++] = path;
     }
 
     closedir(dir);
 
-    if (found == 0) {
-        set_text_color(RED);
-        printf("- no drives found!\n");
-        set_text_color(RESET);
-        printf("enter exit to remove this shell and bypass the warning. enter docs if you believe you do have a drive. otherwise, you can repair through commands.\n");
-        while (1) {
-            set_text_color(GREEN);
-            printf("\n> ");
-            set_text_color(RESET);
-            char command[4096];
+    if (count == 0)
+        no_drives_repl();
 
-            if (!fgets(command, sizeof(command), stdin))
-                break;
+    return count;
+}
 
-            command[strcspn(command, "\n")] = 0;
+int list_dev() {
+    char *drives[64];
+    int count = list_devices(drives, 64);
 
-            if (strcmp(command, "exit") == 0) {
-                break;
-            } else if (strcmp(command, "docs") == 0) {
-                printf("If you believe a drive is present, follow these steps:\n\n");
-
-                printf("1) Firmware / BIOS checks:\n");
-                printf("   - Reboot into firmware setup (BIOS/UEFI).\n");
-                printf("   - Ensure the drive is detected by the firmware.\n");
-                printf("   - Disable Intel RST / RAID / VMD and use AHCI mode.\n");
-                printf("   - For NVMe systems, disable VMD if enabled.\n\n");
-
-                printf("2) Virtual machines:\n");
-                printf("   - Ensure a virtual disk is attached to the VM.\n");
-            } else {
-                system(command);
-            }
-        }
-    } else {
-        set_text_color(GREEN);
-        printf("total %d\n", found);
-        set_text_color(RESET);
+    if (count == 0) {
+        return 0;
     }
-    return found;
+
+    for (int i = 0; i < count; i++) {
+        printf("- %s\n", drives[i]);
+        free(drives[i]);
+    }
+
+    set_text_color(GREEN);
+    printf("total %d\n", count);
+    set_text_color(RESET);
+    return count;
 }
 
 int wipe_drive(char* drive) {
     char command[40]; // should be fine with 30, some space to make sure
     snprintf(command, sizeof(command), "sgdisk --zap-all %s", drive);
-    printf("> %s", command);
-    int exitcode = system(command);
-
-    return exitcode;
-}
-
-int iso_to_img(char*) {
-    return system("mv redroselinux_rootfs.iso rootfs.img");
-}
-
-int dd_drive(char* drive) {
+    printf("> %s\n", command);
     fflush(stdout);
-    char command[100]; // should be fine with 80, some space to make sure
-    snprintf(command, sizeof(command), "dd if=rootfs.img of=%s bs=4M status=progress", drive);
-    printf("> %s", command);
-    int exitcode = system(command);
-
-    return exitcode;
+    return system(command);
 }
 
-// this will be replaced with postinstgen
-// postinst wont need reboot and we will
-// chroot into it for simplicity
+int detect_efi() {
+    int boot_mode;
 
-int drive_patch(char* drive) {
-    // first, we create a mount dir
-    system("mkdir -p rootfs");
+    // if /sys/firmware/efi exists, we are booted in efi
+    if (!system("ls /sys/firmware/efi" == 0)) {
+        // this is inspired by the archwiki where you check
+        // this by uefi bitness, and it was 64 and 32. so i
+        // put it in here because it looks super cool lmfao
+        //
+        // https://wiki.archlinux.org/title/Installation_guide#Verify_the_boot_mode
 
-    drive[strcspn(drive, "\n")] = '\0';
-
-    // now let's mount the drive
-    char command[80]; // should be fine with MUCH less, some space to make sure
-    snprintf(command, sizeof(command), "mount -t auto %s rootfs || mount -t auto %s1 rootfs", drive, drive);
-    system(command);
-
-    // let's edit the grub config
-    const char* grub_path = "rootfs/boot/grub/grub.cfg";
-
-    // open grub.cfg for reading
-    FILE* grubcfg = fopen(grub_path, "r");
-    if (!grubcfg) {
-        perror("failed to open grub.cfg for reading");
-        return -1;
+        // 64 means uefi mode
+        return 64;
+    } else {
+        // 32 means bios mode
+        return 32;
     }
+}
 
-    // determine file size
-    fseek(grubcfg, 0, SEEK_END);
-    long size = ftell(grubcfg);
-    fseek(grubcfg, 0, SEEK_SET);
+int makefs(char* drive) {
+    char command[256];
 
-    // read file into buffer
-    char* buffer = malloc(size + 1);
-    if (!buffer) {
-        fclose(grubcfg);
-        perror("failed to allocate memory for grub.cfg");
-        return -1;
+    snprintf(command, sizeof(command),
+        "sgdisk -n 1:1M:+1M -t 1:ef02 -c 1:\"BIOS boot\" %s", drive
+    );
+    printf("> %s\n", command);
+    fflush(stdout);
+    if (system(command) != 0)
+        return 1;
+
+    snprintf(command, sizeof(command),
+        "sgdisk -n 2:0:+512M -t 2:ef00 -c 2:\"EFI System\" %s", drive
+    );
+    printf("> %s\n", command);
+    fflush(stdout);
+    if (system(command) != 0)
+        return 1;
+
+    snprintf(command, sizeof(command),
+        "sgdisk -n 3:0:0 -t 3:8300 -c 3:\"Redrose Linux\" %s", drive
+    );
+    printf("> %s\n", command);
+    fflush(stdout);
+    if (system(command) != 0)
+        return 1;
+
+    clear();
+    installing_header();
+    printf("\n");
+    separator();
+    printf("\n");
+
+    snprintf(command, sizeof(command), "busybox partprobe %s", drive);
+    printf("> %s\n", command);
+    fflush(stdout);
+    if (system(command) != 0)
+        return 1;
+
+    char *efi_part = get_partition(drive, 2);
+    char *root_part = get_partition(drive, 3);
+
+    snprintf(command, sizeof(command), "mkfs.vfat -F32 %s", efi_part);
+    printf("> %s\n", command);
+    fflush(stdout);
+    if (system(command) != 0)
+        return 1;
+
+    snprintf(command, sizeof(command), "busybox mke2fs -F %s", root_part);
+    printf("> %s\n", command);
+    fflush(stdout);
+    if (system(command) != 0)
+        return 1;
+
+    // copy root
+    mount(get_partition(drive, 3), "/mnt", "ext2", 0, 0);
+    return system("tar -xf rootfs.tar -C /mnt --strip-components=1");
+}
+
+int install_grub(char* drive) {
+    char command[256];
+    char grub_install[] = "chroot /mnt /bin/sh -c 'mkdir -p /dev && mount -t devtmpfs none /dev && grub-install";
+    // craft a command to install grub for specifications.
+    if (detect_efi() == 64) {
+        printf("Mounting ESP\n");
+        mount(get_partition(drive, 2), "/boot/efi", "vfat", 0, 0);
+        snprintf(command, sizeof(command),
+            "%s --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck %s'",
+            grub_install, drive
+        );
+    } else {
+        snprintf(command, sizeof(command),
+            "%s --target=i386-pc --recheck %s'", grub_install, drive
+        );
     }
-    fread(buffer, 1, size, grubcfg);
-    buffer[size] = '\0';
-    fclose(grubcfg);
+    return system(command);
+}
 
-    // allocate new buffer for patched content
-    char* new_buffer = malloc(size * 2); // generous size for replacements
-    if (!new_buffer) {
-        free(buffer);
-        perror("failed to allocate memory for new buffer");
-        return -1;
-    }
-    new_buffer[0] = '\0';
-
-    // patch lines containing "linux " and "root=/dev/sda"
-    char* line = strtok(buffer, "\n");
-    while (line) {
-        if (strstr(line, "linux ") && strstr(line, "root=/dev/sda")) {
-            char patched_line[1024];
-            snprintf(patched_line, sizeof(patched_line), "%.*sroot=%s%s",
-                     (int)(strstr(line, "root=") - line), // copy up to 'root='
-                     line, drive,
-                     strchr(strstr(line, "root="), ' ') ? strchr(strstr(line, "root="), ' ') : "");
-            strcat(new_buffer, patched_line);
-        } else {
-            strcat(new_buffer, line);
-        }
-        strcat(new_buffer, "\n");
-        line = strtok(NULL, "\n");
-    }
-
-    // write back patched config
-    grubcfg = fopen(grub_path, "w");
-    if (!grubcfg) {
-        perror("failed to open grub.cfg for writing");
-        free(buffer);
-        free(new_buffer);
-        return -1;
-    }
-
-    fwrite(new_buffer, 1, strlen(new_buffer), grubcfg);
-    fclose(grubcfg);
-
-    // cleanup
-    free(buffer);
-    free(new_buffer);
-
+int patch(char* drive) {
     return 0;
-    printf("this function is disabled until we fix some issues with it\n");
+    // TODO
+}
 
-    return 0;
+int localhost(char* name) {
+    char command[256];
+    if (name[0] == '\n') {
+        snprintf(command, sizeof(command), "busybox chroot /mnt /bin/sh -c 'mkdir /etc &&echo iuseredrosebtw > /etc/hostname'");
+    } else {
+        name[strcspn(name, "\n")] = 0;
+        snprintf(command, sizeof(command), "busybox chroot /mnt /bin/sh -c 'mkdir /etc &&echo %s > /etc/hostname'", name);
+    }
+    return system(command);
 }
