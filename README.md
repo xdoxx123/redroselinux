@@ -39,21 +39,15 @@ Otherwise, download from the Releases tab.
 The installer can run on a potato, litterally, it needs ~131.200005M RAM. I did not do any tests for CPU.
 
 ## Development
+
+When compiling, the Makefile copies your system libraries. You need to build them yourself if you do not want the system ones.
+
 ### nightly
-To compile the nightly version, clone `mostypc123/redroselinux`. Because of the way it works, you must also run:
-
-```
-python3 copy_syslibs.py
-```
-
-and compile:
+To compile the nightly version, clone `mostypc123/redroselinux` and compile:
 
 ```
 make
 ```
-
-The instructions will be changed after the next release, watch for it.
-
 
 ### stable
 *this repo uses busybox. **the linuxImage file is here solely for the CI***. This will be moved to the `car-coreutils-repo` and downloaded in the `Makefile`.
