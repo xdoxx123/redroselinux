@@ -30,6 +30,7 @@ We made a launcher to launch Redrose in QEMU. To run it, paste this into your te
 ```bash
 curl -sSSL https://raw.githubusercontent.com/redroselinux/redroselinux/refs/heads/main/src/redrose-launcher/main.py | python3
 ```
+**In case you have issues, try clearing your `/tmp` and re-running.**
 
 This uses the latest **release**.
 
