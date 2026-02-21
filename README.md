@@ -8,6 +8,8 @@
 
 Redrose Linux is an **independent, reproducible, EU-based and beatiful** Linux distribution. It targets the **x86_64 architecture**, has a custom installer and a custom desktop enviroment.
 
+IF ANYONE TELLS YOU THIS IS ARCH-BASED. THAT IS OUTDATED INFORMATION. IT IS NO LONGER THE THRUTH.
+
 >[!CAUTION]
 > Redrose Linux is under active development and is **not ready for daily use**.
 
@@ -16,11 +18,11 @@ Redrose Linux is an **independent, reproducible, EU-based and beatiful** Linux d
 - **Dev branch**: https://github.com/mostypc123/redroselinux
 
 <div align="center">
-  <img width="400" alt="image" src="https://github.com/user-attachments/assets/a24eb7f2-a3fd-41f2-ab44-f626b7108bda" />
-  <img width="400" alt="image" src="https://github.com/user-attachments/assets/19af0ebe-0873-4101-ac63-075c7157fc24" />
+  <img width="400" alt="image" src="https://github.com/user-attachments/assets/ddcd994a-e02b-48fc-9541-54c9065cd6df" />
+  <img width="400" alt="image" src="https://github.com/user-attachments/assets/f9183b28-adef-425a-a9ae-16133395aa4c" />
+  <img width="400" alt="image" src="https://github.com/user-attachments/assets/1e1a3188-70ab-4609-8f22-9c25b5df1521" />
+  <img width="400" alt="image" src="https://github.com/user-attachments/assets/16c96925-fa6a-49f6-a8a0-fcaf98e21e0e" />
 </div>
-
-Yes, the Makefile is fancy because I opened Cursor for fun. You guessed it
 
 ## Download
 
