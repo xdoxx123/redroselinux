@@ -8,7 +8,7 @@
 
 Redrose Linux is an **independent, reproducible, EU-based and beatiful** Linux distribution. It targets the **x86_64 architecture**, has a custom installer and a custom desktop enviroment.
 
-IF ANYONE TELLS YOU THIS IS ARCH-BASED. THAT IS OUTDATED INFORMATION. IT IS NO LONGER THE THRUTH.
+**IF ANYONE TELLS YOU THIS IS ARCH-BASED. THAT IS OUTDATED INFORMATION. IT IS NO LONGER THE THRUTH.**
 
 >[!CAUTION]
 > Redrose Linux is under active development and is **not ready for daily use**.
@@ -30,7 +30,7 @@ We made a launcher to launch Redrose in QEMU. To run it, paste this into your te
 ```bash
 curl -sSSL https://raw.githubusercontent.com/redroselinux/redroselinux/refs/heads/main/src/redrose-launcher/main.py | python3
 ```
-**In case you have issues, try clearing your `/tmp` and re-running.**
+**In case it says "invalid magic number" when booting, try clearing your `/tmp` and re-running.** This usually happens when your download is corrupted.
 
 This uses the latest **release**.
 
