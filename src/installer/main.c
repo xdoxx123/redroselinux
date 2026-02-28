@@ -9,7 +9,7 @@
 // it exports the other functions from tui.c and
 // backend.c. got nothing else to say
 //
-// was ai used in this file? yes
+// was ai used in this file? yes (run_installation_step)
 
 void shutdown_computer() {
     set_text_color(YELLOW);
@@ -139,7 +139,8 @@ int main() {
         print_step_header();
 
         if (run_installation_step(wipe_drive, drive, "Erasing the drive!", 1) < 0) return 0;
-        if (run_installation_step(makefs, drive, "Making filesystems and copying root!", 1) < 0) return 0;
+        if (run_installation_step(makefs, drive, "Making filesystems!", 1) < 0) return 0;
+        if (run_installation_step(copy_root, drive, "Copying root!", 1) < 0) return 0;
         if (run_installation_step(install_grub, drive, "Installing GRUB!", 0) < 0) return 0;
         if (run_installation_step(patch, drive, "Running patches!", 0) < 0) return 0;
         if (run_installation_step(localhost, host_name, "Setting hostname!", 0) < 0) return 0;
