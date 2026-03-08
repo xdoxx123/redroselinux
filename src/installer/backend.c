@@ -8,6 +8,7 @@
 #include <sys/mount.h>
 
 #include "common.h"
+#include <unistd.h>
 
 // backend for installer.
 //
@@ -141,8 +142,9 @@ int list_dev() {
     return count;
 }
 
+// this is not vulnerable as theres a ui to pick from preselected drives
 int wipe_drive(char* drive) {
-    char command[40]; // should be fine with 30, some space to make sure
+    char command[256];
     snprintf(command, sizeof(command), "sgdisk --zap-all %s", drive);
     printf("> %s\n", command);
     fflush(stdout);
@@ -246,6 +248,8 @@ int install_grub(char* drive) {
     // craft a command to install grub for specifications.
     if (detect_efi() == 64) {
         printf("Mounting ESP\n");
+        system("busybox mkdir -p /boot/");
+        system("busybox mkdir -p /boot/efi");
         mount(get_partition(drive, 2), "/boot/efi", "vfat", 0, 0);
         snprintf(command, sizeof(command),
             "%s --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck %s --directory=/lib/grub/x86_64-efi'",
@@ -260,17 +264,59 @@ int install_grub(char* drive) {
 }
 
 int patch(char* drive) {
-    return 0;
     // TODO
+    return 0;
 }
 
-int localhost(char* name) {
-    char command[256];
-    if (name[0] == '\n') {
-        snprintf(command, sizeof(command), "busybox chroot /mnt /bin/sh -c 'mkdir -p /etc &&echo iuseredrosebtw > /etc/hostname'");
+int localhost(char *name) {
+    const char *default_name = "iuseredrosebtw";
+    char *hostname = name;
+
+    if (name[0] == '\n' || name[0] == '\0') {
+        hostname = (char *)default_name;
     } else {
-        name[strcspn(name, "\n")] = 0;
-        snprintf(command, sizeof(command), "busybox chroot /mnt /bin/sh -c 'mkdir -p /etc &&echo %s > /etc/hostname'", name);
+        name[strcspn(name, "\n")] = '\0';
     }
-    return system(command);
+
+    FILE *f = fopen("/mnt/etc/hostname", "w");
+    if (!f) {
+        perror("fopen");
+        return -1;
+    }
+
+    fprintf(f, "%s\n", hostname);
+    fclose(f);
+
+    return 0;
+}
+
+// dear c,
+// add lambdas please
+static int umount_detach(char *path) {
+    sync();
+    if (umount2(path, MNT_DETACH) != 0) {
+        return -1;
+    }
+    return 0;
+}
+
+// if user wants to change the system before un-mounting /mnt,
+// this function lets them to do so
+int chroot_(char *h) {
+    char buf[8];
+    printf("Do you wish to chroot into the mounted system before it's unmounted? [N/y] ");
+    if (fgets(buf, sizeof(buf), stdin)) {
+        if (buf[0] == 'y' || buf[0] == 'Y') {
+            system("chroot /mnt /bin/sh");
+        }
+    }
+
+    printf("Do you wish to run /bin/sh in this live enviroment? [N/y] ");
+    if (fgets(buf, sizeof(buf), stdin)) {
+        if (buf[0] == 'y' || buf[0] == 'Y') {
+            system("/bin/sh");
+        }
+    }
+
+    return 0;
 }
