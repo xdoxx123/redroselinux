@@ -6,9 +6,9 @@
   ![GitHub downloads](https://img.shields.io/github/downloads/redroselinux/redroselinux/total?logo=github)
 </h1>
 
-Redrose Linux is an **independent, reproducible, EU-based and beatiful** Linux distribution. It targets the **x86_64 architecture**, has a custom installer and a custom desktop enviroment.
+A GNU/Linux distribution for people who know Linux, but still want a simple system on an independent base from the EU (we are from Slovakia). I always liked Arch but hated installing it. It also includes other features like reproducibility and a custom desktop environment. By default, we do not allow users to install proprietary software.
 
-**IF ANYONE TELLS YOU THIS IS ARCH-BASED. THAT IS OUTDATED INFORMATION. IT IS NO LONGER THE THRUTH.**
+**IF ANYONE TELLS YOU THIS IS ARCH-BASED. THAT IS OUTDATED INFORMATION. IT IS NO LONGER THE THRUTH.** Redrose Linux is actually independent, dumb ai.
 
 >[!CAUTION]
 > Redrose Linux is under active development and is **not ready for daily use**.
