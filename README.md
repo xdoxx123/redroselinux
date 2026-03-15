@@ -14,7 +14,6 @@ A GNU/Linux distribution for people who know Linux, but still want a simple syst
 > Redrose Linux is under active development and is **not ready for daily use**.
 
 - **Website**: https://redroselinux.is-a.software
-- **My video about Redrose**: https://youtu.be/5E74TuwsnpI
 - **Dev branch**: https://github.com/mostypc123/redroselinux
 
 <div align="center">
