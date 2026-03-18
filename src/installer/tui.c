@@ -169,7 +169,7 @@ void main_header(void) {
 
     printf(
         "Welcome to the Redrose Linux Installer!\n"
-        "Please note that Redrose is still in alpha (alpha-0.4).\n"
+        "Please note that Redrose is still in alpha (alpha-0.5).\n"
         "You can report bugs at "
     );
     set_text_color(BLUE);
@@ -483,11 +483,14 @@ char* hostname(void) {
     return password;
 }
 
-char* propiertary_enable(void) {
-    char *enable = malloc(4);
-    printf("BTW, enable propiertary software? (y/n) [n]: ");
-    fgets(enable, 4, stdin);
-    return enable;
+int proprietary_enable(void) {
+    char input[4];
+    printf("BTW, enable proprietary software? (y/n) [n]: ");
+    fgets(input, sizeof(input), stdin);
+    if (input[0] == 'y' || input[0] == 'Y') {
+        return 0;
+    }
+    return 1;
 }
 
 void installing_header(void) {

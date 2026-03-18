@@ -234,8 +234,8 @@ int makefs(char* drive) {
 int copy_root(char* drive) {
     printf("mounting root\n");
     mount(get_partition(drive, 3), "/mnt", "ext2", 0, 0);
-    printf("> tar -xf rootfs.tar -C /mnt --strip-components=1\n");
-    return system("busybox tar -xf rootfs.tar -C /mnt --strip-components=1");
+    printf("> gzip -dc rootfs.tar.gz | tar -xf - -C /mnt --strip-components=1\n");
+    return system("busybox gzip -dc rootfs.tar.gz | busybox tar -xf - -C /mnt --strip-components=1");
 }
 
 int install_grub(char* drive) {
@@ -345,7 +345,7 @@ int create_users(char *username, char *password, char *root_password) {
     if (password[0] == '\0') {
         strcpy(password, "redrose");
     }
-    
+
     mkdir("/mnt/root", 0755);
     // root password
     root_password[strcspn(root_password, "\n")] = '\0';
@@ -395,6 +395,27 @@ int create_users(char *username, char *password, char *root_password) {
     return system(command);
 }
 
+// so first up, why not just remove the char* from all of these?
+// because the run step func needs a char param to the func so it
+// will fail if we will do otherwise. anyways this installs da busybox
 int install_busybox(char* placeholderthingsotheruninststepfunctionworksfine) {
     return system("busybox chroot /mnt /bin/sh -c '/bin/busybox --install'");
+}
+
+int propriertary_(char*) {
+    FILE *file = fopen("/mnt/etc/car_propiertary.lock", "w");
+    if (file == NULL) {
+        printf("Enabling propriertary software failed");
+        return 1;
+    }
+    fclose(file);
+    return 0;
+}
+
+// car cant curl if we dont have network,
+// we will listup after network sooo it will
+// fail silently but in this case we want it
+int init_car(char* kajbwefhbgbgr) {
+    system("busybox yes 1 | busybox chroot /mnt /bin/sh -c '/bin/car init'");
+    return 0;
 }

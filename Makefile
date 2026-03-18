@@ -7,7 +7,7 @@ INITRAMFS_GZ = $(OUTPUT_DIR)/initramfs.cpio.gz
 ISO = $(OUTPUT_DIR)/redrose_linux.iso
 
 all: dep clean installer squash-root initramfs iso vm
-no-vm: clean installer squash-root initramfs iso
+no-vm: dep clean installer squash-root initramfs iso
 
 help:
 	@echo "run 'make' to compile"
@@ -57,7 +57,7 @@ squash-root:
 	    yes "$$line" | python3 strap.py; \
 	done < rootfs/rootfs_strap_packages
 	test -f rootfs/filesystem/bin/car || ( \
-		curl -s -L -o rootfs/filesystem/bin/car https://github.com/redroselinux/car/releases/download/latest/car && \
+		curl -s -L -o rootfs/filesystem/bin/car https://github.com/redroselinux/car/releases/latest/download/car && \
 		chmod +x rootfs/filesystem/bin/car \
 	)
 	mkdir -p rootfs/filesystem/lib64
@@ -67,6 +67,8 @@ squash-root:
 	mkdir -p rootfs/filesystem/usr/lib/grub
 	cp linuxImage rootfs/filesystem/boot/linuxImage
 	sudo tar -cpf initramfs/rootfs.tar -C rootfs filesystem
+	sudo gzip -f initramfs/rootfs.tar
+	sudo rm -f initramfs/rootfs.tar
 
 iso:
 	cp linuxImage $(FS_DIR)/boot/
