@@ -67,7 +67,7 @@ squash-root:
 	mkdir -p rootfs/filesystem/usr/lib/grub
 	cp linuxImage rootfs/filesystem/boot/linuxImage
 	sudo tar -cpf initramfs/rootfs.tar -C rootfs filesystem
-	sudo gzip -f initramfs/rootfs.tar
+	sudo gzip -f initramfs/rootfs.tar -5
 	sudo rm -f initramfs/rootfs.tar
 
 iso:
@@ -82,6 +82,7 @@ run-installer:
 	initramfs/bin/install
 
 clean:
+	rm -f rootfs/filesystem/etc/repro.car
 	rm -f $(INITRAMFS_CPIO) $(INITRAMFS_GZ) $(ISO)
 	rm -f initramfs/bin/install filesystem/boot/initramfs.cpio.gz filesystem/boot/linuxImage redrose_linux.qcow2
 	rm -f rootfs/filesystem/boot/initramfs_rootfs.cpio.gz rootfs/filesystem/boot/linuxImage
@@ -94,10 +95,10 @@ bare-build: installer squash-root initramfs iso
 no-clean: installer squash-root initramfs iso vm
 
 installed-vm:
-	qemu-system-x86_64 -drive file=redrose_linux.qcow2,format=qcow2 -m 2048 -boot c -enable-kvm 2>/dev/null
+	qemu-system-x86_64 -drive file=redrose_linux.qcow2,format=qcow2 -m 2048 -boot c -enable-kvm -smp $$(nproc)
 
 vm:
-	qemu-img create -f qcow2 redrose_linux.qcow2 1G >/dev/null 2>&1
-	qemu-system-x86_64 -cdrom $(ISO) -drive file=redrose_linux.qcow2,format=qcow2 -m 2048 -boot d -enable-kvm
+	qemu-img create -f qcow2 redrose_linux.qcow2 1G
+	qemu-system-x86_64 -cdrom $(ISO) -drive file=redrose_linux.qcow2,format=qcow2 -m 2048 -boot d -enable-kvm -smp $$(nproc)
 
 .PHONY: all initramfs iso clean vms installer run-installer clean-downloads clean-all bare-build no-clean vm help installed-vm squash-root dep
