@@ -47,7 +47,7 @@ The installer can run on a potato, litterally, it needs ~131.200005M RAM. I did 
 
 ## Development
 
-When compiling, the Makefile copies your system libraries. You need to build them yourself if you do not want the system ones.
+When compiling, the Makefile copies your system libraries. Note that not all of them are copied, since _most_ of the packages are bootstrapped using our package manager - car. You need to build them yourself if you do not want the system ones.
 If you wish to edit the installer code, run from source tree:
 
 ```bash
