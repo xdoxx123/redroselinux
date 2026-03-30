@@ -13,6 +13,7 @@ This is an independent distro from Europe (slovakia). This distro is kind of opi
 >[!CAUTION]
 > Redrose Linux is under active development and is **not ready for daily use**.
 
+- **Docs**: https://redroselinux.miraheze.org
 - **Website**: https://redroselinux.is-a.software
 - **Dev branch**: https://github.com/mostypc123/redroselinux
 
@@ -34,8 +35,11 @@ This uses the latest **release**.
 
 Otherwise, download from the Releases tab.
 
+> https://redroselinux.miraheze.org/wiki/Installation
+
 ## Hardware Requirements
 
+**This was tested on alpha 0.2** 
 The installer can run on a potato, litterally, it needs ~131.200005M RAM. I did not do any tests for CPU.
 
 ## Development
@@ -48,6 +52,9 @@ python3 enable_debug.py
 ```
 
 ### nightly
+
+> https://redroselinux.miraheze.org/wiki/Installation_(nightly)
+
 To compile the nightly version, clone `mostypc123/redroselinux` and compile:
 
 ```
@@ -95,6 +102,5 @@ Wilted rose:<br>
 - **Email**: mostypc7@gmail.com
 
 ## Random stats no one reads
-## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=redroselinux/redroselinux&type=date&legend=top-left)](https://www.star-history.com/#redroselinux/redroselinux&type=date&legend=top-left)
