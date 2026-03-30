@@ -25,6 +25,8 @@ This is an independent distro from Europe (slovakia). This distro is kind of opi
 
 ## Download
 
+> https://redroselinux.miraheze.org/wiki/Installation#Obtaining_a_disk_image
+
 We made a launcher to launch Redrose in QEMU. To run it, paste this into your terminal:
 ```bash
 curl -sSSL https://raw.githubusercontent.com/redroselinux/redroselinux/refs/heads/main/src/redrose-launcher/main.py | python3
@@ -40,6 +42,7 @@ Otherwise, download from the Releases tab.
 ## Hardware Requirements
 
 **This was tested on alpha 0.2** 
+
 The installer can run on a potato, litterally, it needs ~131.200005M RAM. I did not do any tests for CPU.
 
 ## Development
@@ -62,7 +65,6 @@ make
 ```
 
 ### stable
-*this repo uses busybox. **the linuxImage file is here solely for the CI***. This will be moved to the `car-coreutils-repo` and downloaded in the `Makefile`.
 
 To build Redrose Linux, first build a Linux kernel.
 - clone the source
