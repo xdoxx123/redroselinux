@@ -5,7 +5,7 @@ gi.require_version('Gtk','4.0')
 gi.require_version('Rsvg','2.0')
 from gi.repository import GLib,Gtk
 ISO_DIR=f"{os.environ.get("HOME")}/.cache"
-VERSIONS={'alpha-0.4.1':'https://github.com/redroselinux/redroselinux/releases/download/alpha0.4.1/redrose_linux.iso','alpha-0.4':'https://github.com/redroselinux/redroselinux/releases/download/alpha0.4/redrose_linux.iso','alpha-0.3':'https://github.com/redroselinux/redroselinux/releases/download/alpha0.3/redrose_linux.iso','alpha-0.2':'https://github.com/redroselinux/redroselinux/releases/download/alpha0.2/redrose_linux.iso','alpha-0.1':'https://github.com/redroselinux/redroselinux/releases/download/alpha0.1/redrose_linux.iso'}
+VERSIONS={"alpha-o.4.2":"https://github.com/redroselinux/redroselinux/releases/download/alpha0.4.2/redrose_linux.iso", 'alpha-0.4.1':'https://github.com/redroselinux/redroselinux/releases/download/alpha0.4.1/redrose_linux.iso','alpha-0.4':'https://github.com/redroselinux/redroselinux/releases/download/alpha0.4/redrose_linux.iso','alpha-0.3':'https://github.com/redroselinux/redroselinux/releases/download/alpha0.3/redrose_linux.iso','alpha-0.2':'https://github.com/redroselinux/redroselinux/releases/download/alpha0.2/redrose_linux.iso','alpha-0.1':'https://github.com/redroselinux/redroselinux/releases/download/alpha0.1/redrose_linux.iso'}
 def download_file(url,path,progress_callback):
 	with requests.get(url,stream=True)as A:
 		A.raise_for_status();C=int(A.headers.get('content-length',0));D=0
