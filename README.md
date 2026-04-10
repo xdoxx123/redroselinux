@@ -31,7 +31,7 @@ We made a launcher to launch Redrose in QEMU. To run it, paste this into your te
 ```bash
 curl -sSSL https://raw.githubusercontent.com/redroselinux/redroselinux/refs/heads/main/src/redrose-launcher/main.py | python3
 ```
-**In case it says "invalid magic number" when booting, try clearing your `/tmp` and re-running.** This usually happens when your download is corrupted.
+**In case it says "invalid magic number" when booting, try clearing your `/var/cache` and re-running.** This usually happens when your download is corrupted.
 
 This uses the latest **release**.
 
