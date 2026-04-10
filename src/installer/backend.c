@@ -239,7 +239,7 @@ int copy_root(char* drive) {
 }
 
 int install_grub(char* drive) {
-    char command[256];
+    char command[1024];
     char grub_install[] = "busybox chroot /mnt /bin/sh -c '"
         "busybox mkdir -p /proc &&mount -t proc proc /proc && "
         "busybox mkdir -p /sys &&mount -t sysfs sys /sys && "
@@ -326,7 +326,7 @@ int chroot_(char *h) {
 int sanitize_input(char* input) {
     char *p = input;
     while (*p) {
-        if (*p == '$' || *p == '(' || *p == ')' || *p == ';') {
+        if (*p == '$' || *p == '(' || *p == ')' || *p == ';' || *p == '\'') {
             *p = '_';
         }
         p++;
