@@ -11,7 +11,7 @@ no-vm: dep clean installer squash-root initramfs iso
 
 help:
 	@echo "run 'make' to compile"
-	@echo "does not support -j$(nproc)"
+	@echo "does not support -j$$(nproc)"
 	@echo "on fedora, run 'make -f Makefile-fedora'"
 
 dep:
@@ -20,8 +20,8 @@ dep:
 	mkdir -p rootfs/filesystem/usr/
 	mkdir -p rootfs/filesystem/usr/lib
 	mkdir -p rootfs/filesystem/usr/lib/grub
-	sudo cp -p /lib64/ld-linux-x86-64.so.2 rootfs/filesystem/lib64/
-	for cmd in grub-mkrescue curl bash gzip gcc qemu-img qemu-system-x86_64 python3; do \
+	 cp -p /lib64/ld-linux-x86-64.so.2 rootfs/filesystem/lib64/
+	for cmd in grub-mkrescue curl bash gzip gcc qemu-img qemu-system-x86_64 python3 cpio fakeroot xorriso; do \
 		if command -v $$cmd >/dev/null 2>&1; then \
 			echo -n "✓ $$cmd  "; \
 		else \
@@ -29,7 +29,7 @@ dep:
 			exit 1; \
 		fi; \
 	done;
-	python3 copy_syslibs.py
+	 python3 copy_syslibs.py
 
 initramfs:
 	bash -c 'mkdir -p initramfs/{proc,sys,mnt}'
@@ -67,9 +67,9 @@ squash-root:
 	mkdir -p rootfs/filesystem/usr/lib
 	mkdir -p rootfs/filesystem/usr/lib/grub
 	cp linuxImage rootfs/filesystem/boot/linuxImage
-	sudo tar -cpf initramfs/rootfs.tar -C rootfs filesystem
-	sudo gzip -f initramfs/rootfs.tar -5
-	sudo rm -f initramfs/rootfs.tar
+	fakeroot tar -cpf initramfs/rootfs.tar -C rootfs filesystem
+	 gzip -f initramfs/rootfs.tar -5
+	 rm -f initramfs/rootfs.tar
 
 iso:
 	cp linuxImage $(FS_DIR)/boot/
@@ -78,6 +78,7 @@ iso:
 
 installer:
 	$(CC) src/installer/main.c -o initramfs/bin/install -static 2>&1
+	$(CC) src/welcome/main.c -o rootfs/filesystem/bin/welcome
 
 run-installer:
 	initramfs/bin/install
@@ -96,10 +97,10 @@ bare-build: installer squash-root initramfs iso
 no-clean: installer squash-root initramfs iso vm
 
 installed-vm:
-	qemu-system-x86_64 -drive file=redrose_linux.qcow2,format=qcow2 -m 2048 -boot c -enable-kvm -smp $$(nproc)
+	qemu-system-x86_64 -drive file=redrose_linux.qcow2,format=qcow2 -m 2048 -boot c -enable-kvm -smp $$(nproc) -display gtk
 
 vm:
 	qemu-img create -f qcow2 redrose_linux.qcow2 1G
-	qemu-system-x86_64 -cdrom $(ISO) -drive file=redrose_linux.qcow2,format=qcow2 -m 2048 -boot d -enable-kvm -smp $$(nproc)
+	qemu-system-x86_64 -cdrom $(ISO) -drive file=redrose_linux.qcow2,format=qcow2 -m 2048 -boot d -enable-kvm -smp $$(nproc) -display gtk
 
 .PHONY: all initramfs iso clean vms installer run-installer clean-downloads clean-all bare-build no-clean vm help installed-vm squash-root dep
