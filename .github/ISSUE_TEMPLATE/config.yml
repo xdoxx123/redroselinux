@@ -1,8 +1,0 @@
-blank_issues_enabled: false
-contact_links:
-  - name: Reporting security vulnerabilities
-    url: https://github.com/redroselinux/redroselinux/blob/main/SECURITY.md
-    about: Please report security vulnerabilities here.
-  - name: Github Discussions
-    url: github.com/orgs/redroselinux/discussions
-    about: General talk goes here.
