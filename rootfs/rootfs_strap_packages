@@ -15,10 +15,12 @@ newt
 nm
 nss
 nspr
+nullinitrd
 openssl
 pcre2
 sed
 tar
 util-linux-libs-only
 xz
+zlib
 zstd

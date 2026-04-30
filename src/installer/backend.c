@@ -231,6 +231,7 @@ int install_grub(char* drive) {
     char command[1024];
     char grub_install[] = "busybox chroot /mnt /bin/sh -c '"
         "export LD_LIBRARY_PATH=/usr/lib:/lib:/usr/lib64:/lib64 &&"
+        //"export LD_PRELOAD=/usr/lib/libdevmapper.so.1.02 &&"
         "busybox mkdir -p /proc &&mount -t proc proc /proc && "
         "busybox mkdir -p /sys &&mount -t sysfs sys /sys && "
         "busybox mkdir -p /dev &&mount -t devtmpfs dev /dev && "
@@ -359,6 +360,8 @@ int create_users(char *username, char *password, char *root_password) {
         return 1;
     }
 
+    printf("adduser: created user '%s'\n", username);
+
     // set user password
     char sanitized[128];
     strncpy(sanitized, password, sizeof(sanitized) - 1);
@@ -409,6 +412,27 @@ int propriertary_(char*) {
 // we will listup after network sooo it will
 // fail silently but in this case we want it
 int init_car(char* kajbwefhbgbgr) {
+    set_text_color(YELLOW);
+    printf("THIS IS SUPPOSED TO FAIL. DO NOT MIND THE ERROR MESSAGES.\n");
+    set_text_color(RESET);
     system("busybox yes 1 | busybox chroot /mnt /bin/sh -c '/bin/car init'");
     return 0;
+}
+
+int regenerate_initramfs(char*) {
+    return system(
+        "mount --bind /proc /mnt/proc && "
+        "mount --bind /sys /mnt/sys && "
+        "mount --bind /dev /mnt/dev && "
+        "busybox mkdir -p /mnt/tmp && "
+        "mount -t tmpfs tmp /mnt/tmp && "
+        "busybox chroot /mnt /bin/sh -c "
+            "'export LD_LIBRARY_PATH=/usr/lib:/lib:/lib64:/usr/local/lib && "
+            "export PATH=/usr/bin:/bin:/sbin && "
+            "/usr/bin/nullinitrd' ; "
+        "busybox umount /mnt/dev ; "
+        "busybox umount /mnt/sys ; "
+        "busybox umount /mnt/proc ; "
+        "busybox umount /mnt/tmp"
+    );
 }
