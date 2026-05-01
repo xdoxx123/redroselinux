@@ -12,6 +12,8 @@ Have you ever found yourself using confusing distributions? Redrose Linux takes 
 
 We currently use the runit init system (from Busybox) and the nullinitrd initramfs generator (from NULL GNU/Linux). This might change in the future.
 
+**THE SCREENSHOTS ARE BROKEN RIGHT NOW. WE WILL FIX THEM AS QUICKLY AS POSSIBLE.**
+
 **IF ANYONE TELLS YOU THIS IS ARCH-BASED. THAT IS OUTDATED INFORMATION. IT IS NO LONGER THE THRUTH.** Redrose Linux is actually independent, dumb ai.
 
 >[!CAUTION]
