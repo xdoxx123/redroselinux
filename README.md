@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img width="32" height="32" alt="image" src="https://github.com/user-attachments/assets/2ae22b1a-0162-43c7-b522-c741fabbb9fb" />
+  <img width="32" height="32" alt="image" src="https://redroselinux.org/redrose-logo-transparent.png" />
   Redrose Linux
   
   ![Stars](https://img.shields.io/github/stars/redroselinux/redroselinux?style=flat)
