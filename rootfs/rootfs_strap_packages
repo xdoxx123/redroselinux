@@ -9,10 +9,10 @@ glib
 glibc
 grep
 groff
+iwd
 libffi
 libslang
 lz4
-newt
 nano
 ncurses
 newt
@@ -21,6 +21,7 @@ nspr
 nullinitrd
 openssl
 pcre2
+readline
 sed
 tar
 util-linux-libs-only

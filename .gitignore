@@ -1,10 +1,12 @@
-rootfs/filesystem/etc/repro.car
+rootfs/filesystem/etc/car/saves
 rootfs/filesystem/usr/*
 rootfs/filesystem/*bin
 rootfs/filesystem/lib*
 rootfs/filesystem/var
 rootfs/filesystem/etc/nullinitrd
-vmlinuz-6.19.2
+vmlinuz-*
+rootfs/filesystem/boot/vmlinuz-*
+filesystem/boot/vmlinuz-*
 *.tar.zst
 strap_packages
 libcp
@@ -20,4 +22,5 @@ rootfs/filesystem/etc/dbus*
 rootfs/filesystem/etc/rpc
 rootfs/filesystem/etc/slsh.rc
 repro.car
+rootfs/filesystem/etc/repro.car
 rootfs/filesystem/etc/ld.so.cache
