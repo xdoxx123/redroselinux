@@ -184,7 +184,7 @@ int makefs(char* drive) {
             return 1;
     } else {
         snprintf(command, sizeof(command),
-            "sgdisk -n 2:0:+512M -t 2:ef00 -c 2:\"EFI System\" %s", drive
+            "sgdisk -n 2:0:+512M -t 2:ef00 -c 1:\"EFI System\" %s", drive
         );
         printf("> %s\n", command);
         fflush(stdout);
@@ -374,14 +374,14 @@ static int umount_detach(char *path) {
 // this function lets them to do so
 int chroot_(char *h) {
     char buf[8];
-    printf("Do you wish to chroot into the mounted system before it's unmounted? [N/y] ");
+    printf("  Do you wish to chroot into the mounted system before it's unmounted? [N/y] ");
     if (fgets(buf, sizeof(buf), stdin)) {
         if (buf[0] == 'y' || buf[0] == 'Y') {
             system("busybox chroot /mnt /bin/sh");
         }
     }
 
-    printf("Do you wish to run /bin/sh in this live enviroment? [N/y] ");
+    printf("  Do you wish to run /bin/sh in this live enviroment? [N/y] ");
     if (fgets(buf, sizeof(buf), stdin)) {
         if (buf[0] == 'y' || buf[0] == 'Y') {
             system("/bin/sh");

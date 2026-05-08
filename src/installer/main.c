@@ -125,18 +125,19 @@ int main() {
             return -1;
         }
         fputs("\n", stdout);
-        if (run_installation_step(install_grub, drive, "Installing GRUB!", 0) < 0) { success = 0; goto cleanup; }
+        if (run_installation_step(install_grub, drive, "Installing GRUB!", 1) < 0) { success = 0; goto cleanup; }
         if (propriertary == 0)
             if (run_installation_step(propriertary_, "", "Enabling propriertary software!", 0) < 0) { success = 0; goto cleanup; }
         if (run_installation_step(localhost, host_name, "Setting hostname!", 0) < 0) { success = 0; goto cleanup; }
         if (run_installation_step(init_car, "", "Initializing Car!", 0) < 0) { success = 0; goto cleanup; }
         if (run_installation_step(install_busybox, "", "Installing BusyBox!", 0) < 0) { success = 0; goto cleanup; }
-        if (run_installation_step(regenerate_initramfs, "", "Regenerating initramfs!", 0) < 0) { success = 0; goto cleanup; }
-        if (run_installation_step(uuid_drive, "/mnt", "Assigning UUID to drive!", 0) < 0) { success = 0; goto cleanup; }
-        if (run_installation_step(patch, drive, "Running patches!", 0) < 0) { success = 0; goto cleanup; }
+        if (run_installation_step(regenerate_initramfs, "", "Regenerating initramfs!", 1) < 0) { success = 0; goto cleanup; }
+        if (run_installation_step(uuid_drive, "/mnt", "Assigning UUID to drive!", 1) < 0) { success = 0; goto cleanup; }
+        if (run_installation_step(patch, drive, "Running patches!", 1) < 0) { success = 0; goto cleanup; }
 cleanup:
         enable_echo();
         if (!success) return 0;
+        printf("  Installation complete!\n");
         if (run_installation_step(chroot_, "", "Choose an option!", 0) < 0) return 0; disable_echo();
         if (run_installation_step(umount_detach, "/mnt", "Unmounting root!", 0) < 0) { success = 0; goto cleanup2; }
 cleanup2:

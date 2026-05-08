@@ -1,12 +1,14 @@
 #!/bin/sh
 
+chvt 29
+exec > /dev/tty29 2>&1
+
 some_failed=0
 
 if [ "$(id -u)" -ne 0 ]; then
     printf "\033[91m*\033[0m \033[97mShutdown script must be run as root. Exiting.\033[0m\n"
     exit 1
 fi
-busybox clear
 printf "\033[95m*\033[0m \033[97mShutting down...\033[0m\n" || some_failed=1
 
 printf "\033[96m*\033[0m \033[97mStopping services\n"
@@ -28,10 +30,6 @@ busybox sync || some_failed=1
 
 if [ "$some_failed" -ne 0 ]; then
     printf "\033[91m*\033[0m \033[97mSome parts of the shutdown process have failed.\033[0m\n"
-    sleep 2
 fi
-
-printf "\033[91m*\033[0m \033[97mPowering off in 1 second\n" || some_failed=1
-busybox sleep 1
 
 busybox poweroff -f

@@ -1,26 +1,30 @@
 #!/bin/sh
 #
 some_failed=0
-busybox mkdir -p /proc /sys /dev /tmp /run /dev/pts || some_failed=1
+busybox mkdir -p /proc /sys /dev /tmp /run || some_failed=1
 
 { mount -t proc proc /proc \
-    && printf "\033[36m*\033[0m Mounting \033[97m/proc\033[0m\n" \
+    && printf "\033[36m*\033[0m Mounted \033[97m/proc\033[0m\n" \
     || { printf "\033[91m*\033[0m Failed to mount \033[97m/proc\033[0m\n"; some_failed=1; }; }
 busybox mount | busybox grep -q 'on /sys ' || { mount -t sysfs sys /sys \
-    && printf "\033[36m*\033[0m Mounting \033[97m/sys\033[0m\n" \
+    && printf "\033[36m*\033[0m Mounted \033[97m/sys\033[0m\n" \
     || { printf "\033[91m*\033[0m Failed to mount \033[97m/sys\033[0m\n"; some_failed=1; }; }
 busybox mount | busybox grep -q 'on /dev ' || { mount -t devtmpfs devtmpfs /dev \
-    && printf "\033[36m*\033[0m Mounting \033[97m/dev\033[0m\n" \
+    && printf "\033[36m*\033[0m Mounted \033[97m/dev\033[0m\n" \
     || { printf "\033[91m*\033[0m Failed to mount \033[97m/dev\033[0m\n"; some_failed=1; }; }
+mkdir -p /dev/pts /dev/shm
+busybox mount | busybox grep -q 'on /dev/pts ' || { mount -t devpts devpts /dev/pts \
+    && printf "\033[36m*\033[0m Mounted \033[97m/dev/pts\033[0m\n" \
+    || { printf "\033[91m*\033[0m Failed to mount \033[97m/dev/pts\033[0m\n"; some_failed=1; }; }
+busybox mount | busybox grep -q 'on /dev/shm ' || { mount -t tmpfs tmpfs /dev/shm \
+    && printf "\033[36m*\033[0m Mounted \033[97m/dev/shm\033[0m\n" \
+    || { printf "\033[91m*\033[0m Failed to mount \033[97m/dev/shm\033[0m\n"; some_failed=1; }; }
 busybox mount | busybox grep -q 'on /tmp ' || { mount -t tmpfs tmpfs /tmp \
-    && printf "\033[36m*\033[0m Mounting \033[97m/tmp\033[0m\n" \
+    && printf "\033[36m*\033[0m Mounted \033[97m/tmp\033[0m\n" \
     || { printf "\033[91m*\033[0m Failed to mount \033[97m/tmp\033[0m\n"; some_failed=1; }; }
 busybox mount | busybox grep -q 'on /run ' || { mount -t tmpfs tmpfs /run \
-    && printf "\033[36m*\033[0m Mounting \033[97m/run\033[0m\n" \
+    && printf "\033[36m*\033[0m Mounted \033[97m/run\033[0m\n" \
     || { printf "\033[91m*\033[0m Failed to mount \033[97m/run\033[0m\n"; some_failed=1; }; }
-busybox mount | busybox grep -q 'on /dev/pts ' || { mount -t devpts devpts /dev/pts \
-    && printf "\033[36m*\033[0m Mounting \033[97m/dev/pts\033[0m\n" \
-    || { printf "\033[91m*\033[0m Failed to mount \033[97m/dev/pts\033[0m\n"; some_failed=1; }; }
 if [ $some_failed -eq 1 ]; then
     exec /bin/sh
 fi
