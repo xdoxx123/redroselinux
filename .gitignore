@@ -1,26 +1,32 @@
+# kernel files
+vmlinuz-*
+rootfs/filesystem/boot/vmlinuz-*
+filesystem/boot/vmlinuz-*
+
+# build artifacts
+redrose_linux.iso
+redrose_linux.qcow2
+initramfs.cpio.gz
+filesystem/boot/initramfs.cpio.gz
+initramfs/rootfs.tar*
+
+# bootstrapping
+*.tar.zst
+strap_packages
+libcp
+repro.car
+rootfs/filesystem/etc/repro.car
 rootfs/filesystem/etc/car/saves
+initramfs/bin
+
+# package files
+rootfs/filesystem/etc/service/dbus
+rootfs/filesystem/etc/dbus*
+rootfs/filesystem/etc/rpc
+rootfs/filesystem/etc/slsh.rc
+rootfs/filesystem/etc/ld.so.cache
 rootfs/filesystem/usr/*
 rootfs/filesystem/*bin
 rootfs/filesystem/lib*
 rootfs/filesystem/var
 rootfs/filesystem/etc/nullinitrd
-vmlinuz-*
-rootfs/filesystem/boot/vmlinuz-*
-filesystem/boot/vmlinuz-*
-*.tar.zst
-strap_packages
-libcp
-initramfs/rootfs.tar*
-initramfs/bin
-filesystem/boot/initramfs.cpio.gz
-
-redrose_linux.iso
-redrose_linux.qcow2
-initramfs.cpio.gz
-
-rootfs/filesystem/etc/dbus*
-rootfs/filesystem/etc/rpc
-rootfs/filesystem/etc/slsh.rc
-repro.car
-rootfs/filesystem/etc/repro.car
-rootfs/filesystem/etc/ld.so.cache
