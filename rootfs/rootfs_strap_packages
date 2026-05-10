@@ -15,10 +15,12 @@ libslang
 lz4
 nano
 ncurses
+news-reader
 newt
 nss
 nspr
 nullinitrd
+mkfstab
 openssl
 pcre2
 readline
