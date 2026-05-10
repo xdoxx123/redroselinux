@@ -131,7 +131,7 @@ int main() {
         if (run_installation_step(localhost, host_name, "Setting hostname!", 0) < 0) { success = 0; goto cleanup; }
         if (run_installation_step(init_car, "", "Initializing Car!", 0) < 0) { success = 0; goto cleanup; }
         if (run_installation_step(install_busybox, "", "Installing BusyBox!", 0) < 0) { success = 0; goto cleanup; }
-        if (run_installation_step(regenerate_initramfs, "", "Regenerating initramfs!", 1) < 0) { success = 0; goto cleanup; }
+        if (run_installation_step(regenerate_initramfs_fstab, "", "Regenerating initramfs and fstab!", 1) < 0) { success = 0; goto cleanup; }
         if (run_installation_step(uuid_drive, "/mnt", "Assigning UUID to drive!", 1) < 0) { success = 0; goto cleanup; }
         if (run_installation_step(patch, drive, "Running patches!", 1) < 0) { success = 0; goto cleanup; }
 cleanup:
