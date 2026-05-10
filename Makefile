@@ -66,8 +66,16 @@ install-packages: dep
 	done < rootfs/rootfs_strap_packages
 
 squash-root: strip-bins install-packages dep
-	# TODO: symlink full /usr paths
-	ln -sf rootfs/filesystem/bin/tar rootfs/filesystem/usr/bin/tar
+	mkdir -p rootfs/filesystem/usr/bin rootfs/filesystem/usr/sbin rootfs/filesystem/usr/lib rootfs/filesystem/usr/lib64
+	[ -d rootfs/filesystem/bin ]   && cp -a rootfs/filesystem/bin/* rootfs/filesystem/usr/bin/   || true
+	[ -d rootfs/filesystem/sbin ]  && cp -a rootfs/filesystem/sbin/* rootfs/filesystem/usr/sbin/  || true
+	[ -d rootfs/filesystem/lib ]   && cp -a rootfs/filesystem/lib/* rootfs/filesystem/usr/lib/   || true
+	[ -d rootfs/filesystem/lib64 ] && cp -a rootfs/filesystem/lib64/* rootfs/filesystem/usr/lib64/ || true
+	rm -rf rootfs/filesystem/bin rootfs/filesystem/sbin rootfs/filesystem/lib rootfs/filesystem/lib64
+	ln -s usr/bin   rootfs/filesystem/bin
+	ln -s usr/sbin  rootfs/filesystem/sbin
+	ln -s usr/lib   rootfs/filesystem/lib
+	ln -s usr/lib64 rootfs/filesystem/lib64
 	ln -sf /proc/mounts rootfs/filesystem/etc/mtab
 	test -f rootfs/filesystem/bin/car || ( \
 		curl -s -L -o rootfs/filesystem/bin/car https://github.com/redroselinux/car/releases/latest/download/car && \
