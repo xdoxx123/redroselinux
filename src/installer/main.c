@@ -137,7 +137,7 @@ int main() {
 cleanup:
         enable_echo();
         if (!success) return 0;
-        printf("  Installation complete!\n");
+        printf("\e[42;97m  Installation complete!\e[K\e[0m\n");
         if (run_installation_step(chroot_, "", "Choose an option!", 0) < 0) return 0; disable_echo();
         if (run_installation_step(umount_detach, "/mnt", "Unmounting root!", 0) < 0) { success = 0; goto cleanup2; }
 cleanup2:
