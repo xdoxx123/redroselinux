@@ -1,3 +1,9 @@
+-- these packages are installed into rootfs/filesystem.
+-- to add a package, simply write it in a new line.
+-- you should not remove any package as most of them are critical to the system.
+-- syntax: <package>:[optional install_path]:[optional compress-installed-folder/recompress]
+--      requires car    gets auto-created                 always using tar&gzip
+
 acl
 attr
 binutils
@@ -10,6 +16,7 @@ glibc
 grep
 groff
 iwd
+libcap
 libffi
 libslang
 lz4
@@ -26,7 +33,18 @@ pcre2
 readline
 sed
 tar
+-- TODO: use full util-linux
+--       [also libpam]
 util-linux-libs-only
 xz
 zlib
 zstd
+
+-- these packages get installed into (the installer's)initrd because they are
+-- copied when the user picks a preffered findutils/coreutils implementation.
+-- recompressed to gzip; installer live iso does not have zstandard installed
+
+coreutils:initramfs/coreutils-gnu:recompress
+findutils:initramfs/coreutils-gnu:recompress
+uu-coreutils:initramfs/coreutils-uutils:recompress
+uu-findutils:initramfs/coreutils-uutils:recompress

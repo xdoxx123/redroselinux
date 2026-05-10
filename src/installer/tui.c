@@ -523,6 +523,77 @@ void installed_header(void) {
     printf("\n");
 }
 
+int install_utils_ui() {
+    set_text_color(YELLOW);
+    printf(" _   _ _   _ _ _ _   _\n"
+           "| | | | |_(_) (_) |_(_) ___  ___\n"
+           "| | | | __| | | | __| |/ _ \\/ __|\n"
+           "| |_| | |_| | | | |_| |  __/\\__ \\\n"
+           " \\___/ \\__|_|_|_|\\__|_|\\___||___/\n\n");
+    set_text_color(RESET);
+    separator();
+    printf("\nPick your desired implementation of coreutils and findutils.\n");
+
+    const char *options[] = {
+        "GNU coreutils",
+        "busybox",
+        "uutils"
+    };
+    const int n_options = 3;
+    int sel = 0;
+    int first_draw = 1;
+
+    for (;;) {
+        if (first_draw) {
+            printf("Select coreutils implementation. Use ");
+            set_text_color(BLUE);
+            printf("UP/DOWN");
+            set_text_color(RESET);
+            printf(" or ");
+            set_text_color(BLUE);
+            printf("j/k");
+            set_text_color(RESET);
+            printf(" to move, ");
+            set_text_color(BLUE);
+            printf("ENTER");
+            set_text_color(RESET);
+            printf(" to select.\n\n");
+            save_cursor();
+            first_draw = 0;
+        } else {
+            printf("\033[%dA\033[J", n_options + 1);
+        }
+
+        for (int i = 0; i < n_options; i++) {
+            if (i == sel) {
+                set_text_color(GREEN);
+                printf("  > ");
+                set_text_color(WHITE);
+                printf("%s", options[i]);
+                set_text_color(RESET);
+                printf("\n");
+            } else {
+                printf("    %s\n", options[i]);
+            }
+        }
+        printf("\n");
+        fflush(stdout);
+
+        int key = read_key();
+        if (key == KEY_ENTER)
+            break;
+        if (key == KEY_UP || key == KEY_K) {
+            sel--;
+            if (sel < 0) sel = n_options - 1;
+        } else if (key == KEY_DOWN || key == KEY_J) {
+            sel++;
+            if (sel >= n_options) sel = 0;
+        }
+    }
+
+    return sel;
+}
+
 void install_failed(void) {
     set_text_color(RED);
     printf(

@@ -426,10 +426,31 @@ int init_car(char*) {
     return 0;
 }
 
-// install busybox
-int install_busybox(char*) {
+int install_utils(char*) {
+    clear();
+    int sel = install_utils_ui();
     mkdir("/mnt/sbin", 0755);
-    return system("busybox chroot /mnt /bin/sh -c '/bin/busybox --install'");
+    // TODO: completely eliminate busybox; currently redrose requires it
+    if (system("busybox chroot /mnt /bin/sh -c '/bin/busybox --install'") != 0) {
+        return 1;
+    }
+    if (sel == 0) {
+        if (system("busybox sh -c 'busybox tar -xf /coreutils-gnu/coreutils.tar.gz -C /mnt --strip-components=1'") != 0)
+            return 1;
+        if (system("busybox sh -c 'busybox tar -xf /coreutils-gnu/findutils.tar.gz -C /mnt --strip-components=1'") != 0)
+            return 1;
+    } else if (sel == 1) {
+        // TODO: after removing needed busybox the install busybox branch goes here
+        return 0;
+    } else if (sel == 2) {
+        if (system("busybox sh -c 'busybox tar -xf /coreutils-uutils/uu-coreutils.tar.gz -C /mnt --strip-components=1'") != 0)
+            return 1;
+        if (system("busybox sh -c 'busybox tar -xf /coreutils-uutils/uu-findutils.tar.gz -C /mnt --strip-components=1'") != 0)
+            return 1;
+    } else {
+        return 1;
+    }
+    return 0;
 }
 
 // regenerate initramfs (nullinitrd) and fstab (mkfstab)

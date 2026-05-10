@@ -39,3 +39,4 @@ int makefs(char *drive);
 int install_grub(char *drive);
 void enable_echo(void);
 void disable_echo(void);
+int install_utils_ui();

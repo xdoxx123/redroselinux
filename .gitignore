@@ -18,6 +18,7 @@ repro.car
 rootfs/filesystem/etc/repro.car
 rootfs/filesystem/etc/car/saves
 initramfs/bin
+initramfs/coreutils*
 
 # package files
 rootfs/filesystem/etc/service/dbus
