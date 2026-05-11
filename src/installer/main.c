@@ -137,7 +137,6 @@ int main() {
 cleanup:
         enable_echo();
         if (!success) return 0;
-        printf("\e[42;97m  Installation complete!\e[K\e[0m\n");
         if (run_installation_step(chroot_, "", "Choose an option!", 0) < 0) return 0; disable_echo();
         if (run_installation_step(umount_detach, "/mnt", "Unmounting root!", 0) < 0) { success = 0; goto cleanup2; }
 cleanup2:
@@ -145,10 +144,10 @@ cleanup2:
         if (!success) return 0;
 
         installed_header();
-        printf("Thank you for installing the Redrose Linux alpha! Reboot to your new system.\n\n");
-        printf("Please report errors on Github Issues: ");
+        printf("Thank you for installing the Redrose Linux alpha! Reboot to your new system.\n");
+        printf("Please report bugs on Github Issues: ");
         set_text_color(BLUE);
-        printf("https://github.com/redroselinux/redroselinux/issues\n\n");
+        printf("https://github.com/redroselinux/redroselinux/issues\n");
         set_text_color(RESET);
         printf("\n");
         set_text_color(YELLOW);

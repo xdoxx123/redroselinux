@@ -450,6 +450,7 @@ int install_utils(char*) {
     } else {
         return 1;
     }
+    clear();
     return 0;
 }
 
@@ -517,15 +518,21 @@ int patch(char* drive) {
 
 // lets the user chroot into the newly installed system or run a shell in the live system
 int chroot_(char *h) {
+    clear();
+    installed_header();
+    printf("Your Redrose Linux system was installed. You can chroot into it or continue to unmount /mnt.\n\n");
+    separator();
+    printf("\n");
+
     char buf[8];
-    printf("  Do you wish to chroot into the mounted system before it's unmounted? [N/y] ");
+    printf("Do you wish to chroot into the mounted system before it's unmounted? [N/y] ");
     if (fgets(buf, sizeof(buf), stdin)) {
         if (buf[0] == 'y' || buf[0] == 'Y') {
             system("busybox chroot /mnt /bin/sh");
         }
     }
 
-    printf("  Do you wish to run /bin/sh in this live enviroment? [N/y] ");
+    printf("Do you wish to run /bin/sh in this live enviroment? [N/y] ");
     if (fgets(buf, sizeof(buf), stdin)) {
         if (buf[0] == 'y' || buf[0] == 'Y') {
             system("/bin/sh");
