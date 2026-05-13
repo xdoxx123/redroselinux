@@ -30,8 +30,8 @@ if [ $some_failed -eq 1 ]; then
 fi
 
 busybox mkdir -p /var/log || some_failed=1
-busybox chmod 755 /etc/service/*/* || some_failed=1
-busybox chmod 755 /etc/service/*/*/* || some_failed=1
+busybox chmod 755 /etc/sv/*/* || some_failed=1
+busybox chmod 755 /etc/sv/*/log/run || some_failed=1
 if [ $some_failed -eq 1 ]; then
     exec /bin/sh
 fi
