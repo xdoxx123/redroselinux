@@ -1,0 +1,13 @@
+{
+  "description": "Tools to make SystemD users used to Runit quicker",
+  "license": "GPL-3.0-only",
+  "authors": ["mostypc123"],
+  "copyright": "Copyright © 2026, mostypc123",
+  "name": "ireallyloverunit",
+  "buildTypes": {
+    "optimized": {
+      "buildOptions": ["optimize", "inline"],
+      "dflags-ldc": ["-O3", "-flto=full"]
+    }
+  }
+}
