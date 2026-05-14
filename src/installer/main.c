@@ -25,8 +25,18 @@ void error() {
     printf("https://github.com/redroselinux/redroselinux/issues\n");
     set_text_color(RESET);
     printf("\n");
-    enter_continue();
-    shutdown_computer();
+    enable_echo();
+    char buf[8];
+    printf("Do you want to restart the installer or shutdown? [R/s] ");
+    if (fgets(buf, sizeof(buf), stdin)) {
+        if (buf[0] == 'r' || buf[0] == 'R') {
+            execv("/bin/install", NULL);
+        } else if (buf[0] == 'r' || buf[0] == 'R') {
+            shutdown_computer();
+        } else {
+            execv("/bin/install", NULL);
+        }
+    }
 }
 
 int run_installation_step(int (*operation)(char*),
@@ -111,6 +121,9 @@ int main() {
         clear();
         int success = 1;
         disable_echo();
+        if (FAIL_DEBUG == 1) {
+            if (run_installation_step(fail, "", "FAIL_DEBUG is on!", 1) < 0) { success = 0; goto cleanup; }
+        }
         if (run_installation_step(wipe_drive, drive, "Erasing the drive!", 1) < 0) { success = 0; goto cleanup; }
         if (run_installation_step(makefs, drive, "Making filesystems!", 1) < 0) { success = 0; goto cleanup; }
         if (run_installation_step(copy_root, drive, "Copying root!", 1) < 0) { success = 0; goto cleanup; }

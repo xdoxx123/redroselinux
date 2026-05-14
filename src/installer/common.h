@@ -8,11 +8,18 @@
 #define RESET   0
 #define WHITE   97
 
-// Debug:
 // If you are developing, enable this by running:
 // python3 enable_debug.py
+// This lets you view some extra logs and also run commands on the Press ENTER prompts.
 // Make sure not to push this with 1 as the value.
-#define DEBUG   0
+#define DEBUG 0
+// same as above - this breaks the installer on purpose
+#define FAIL_DEBUG 0
+#include <stdio.h>
+int fail(char*) {
+    printf("FAIL_DEBUG is set to 1; Returning 1\n");
+    return 1;
+}
 
 int set_text_color(unsigned color);
 int clear(void);
