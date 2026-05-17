@@ -36,6 +36,8 @@ currently_at_package = False
 version = ""
 install_to = "rootfs/filesystem"
 package = input()
+with open("rootfs/filesystem/etc/redrose-strap", "a", encoding="utf-8") as strap_log:
+    strap_log.write(package + "\n")
 if package == "":
     exit(0)
 elif package.startswith("--"):
