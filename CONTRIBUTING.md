@@ -102,6 +102,7 @@ int gen_postinst_scripts(
         // the code
 }
 ```
+Note: this function does not exist in the code anymore.
 
 ### D
 
