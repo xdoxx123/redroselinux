@@ -216,7 +216,7 @@ int copy_root(char* drive) {
     printf("  Mounting %s\n", get_partition(drive, 3));
     mount(get_partition(drive, 3), "/mnt", "ext2", 0, 0);
     printf("  Extracting /rootfs.tar.gz to /mnt. This may take a while...\n");
-    return system("busybox gzip -dc rootfs.tar.gz | busybox tar -xf - -C /mnt --strip-components=1");
+    return system("busybox gzip -dc rootfs.tar.gz | busybox tar -xvf - -C /mnt --strip-components=1");
 }
 
 // create users, set root password
@@ -406,17 +406,17 @@ int install_utils(char*) {
         return 1;
     }
     if (sel == 0) {
-        if (system("busybox sh -c 'busybox tar -xf /coreutils-gnu/coreutils.tar.gz -C /mnt --strip-components=1'") != 0)
+        if (system("busybox sh -c 'busybox tar -xvf /coreutils-gnu/coreutils.tar.gz -C /mnt --strip-components=1'") != 0)
             return 1;
-        if (system("busybox sh -c 'busybox tar -xf /coreutils-gnu/findutils.tar.gz -C /mnt --strip-components=1'") != 0)
+        if (system("busybox sh -c 'busybox tar -xvf /coreutils-gnu/findutils.tar.gz -C /mnt --strip-components=1'") != 0)
             return 1;
     } else if (sel == 1) {
         // TODO: after removing needed busybox the install busybox branch goes here
         return 0;
     } else if (sel == 2) {
-        if (system("busybox sh -c 'busybox tar -xf /coreutils-uutils/uu-coreutils.tar.gz -C /mnt --strip-components=1'") != 0)
+        if (system("busybox sh -c 'busybox tar -xvf /coreutils-uutils/uu-coreutils.tar.gz -C /mnt --strip-components=1'") != 0)
             return 1;
-        if (system("busybox sh -c 'busybox tar -xf /coreutils-uutils/uu-findutils.tar.gz -C /mnt --strip-components=1'") != 0)
+        if (system("busybox sh -c 'busybox tar -xvf /coreutils-uutils/uu-findutils.tar.gz -C /mnt --strip-components=1'") != 0)
             return 1;
     } else {
         return 1;
