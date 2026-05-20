@@ -28,7 +28,7 @@ dep:
 			exit 1; \
 		fi; \
 	done;
-	 python3 copy_syslibs.py
+	python3 rootfs/copy_syslibs.py
 
 initramfs: dep squash-root
 	bash -c 'mkdir -p initramfs/{proc,sys,mnt}'
@@ -62,7 +62,7 @@ strip-bins: dep install-packages
 
 install-packages: dep
 	while IFS= read -r line; do \
-	    echo "$$line" | python3 strap.py; \
+	    echo "$$line" | python3 rootfs/strap.py; \
 	done < rootfs/rootfs_strap_packages
 
 squash-root: strip-bins install-packages dep

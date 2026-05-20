@@ -25,7 +25,7 @@ dep:
 		fi; \
 	done
 
-	@python3 copy_syslibs.py
+	@python3 rootfs/scopy_syslibs.py
 
 strip-bins:
 	find rootfs/filesystem/bin rootfs/filesystem/*/bin rootfs/filesystem/*/lib* -type f -exec file {} \; | \
@@ -61,7 +61,7 @@ initramfs: dep squash-root
 
 squash-root: strip-bins dep
 	while IFS= read -r line; do \
-		echo "$$line" | python3 strap.py; \
+		echo "$$line" | python3 rootfs/strap.py; \
 	done < rootfs/rootfs_strap_packages
 	mv rootfs/filesystem/usr/bin/tar rootfs/filesystem/bin/tar
 
