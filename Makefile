@@ -61,6 +61,7 @@ strip-bins: dep install-packages
 	done
 
 install-packages: dep
+	rm rootfs/filesystem/etc/redrose-strap
 	while IFS= read -r line; do \
 	    echo "$$line" | python3 rootfs/strap.py; \
 	done < rootfs/rootfs_strap_packages
