@@ -17,7 +17,7 @@ We currently use the runit init system (which we customized) and the nullinitrd 
 >[!CAUTION]
 > Redrose Linux is under active development and is **not ready for daily use**.
 
-- **Docs**: https://redroselinux.miraheze.org
+- **Docs**: https://docs.redroselinux.org/
 - **Website**: https://redroselinux.org/
 - **Dev branch**: develop
 
