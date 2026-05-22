@@ -1,0 +1,3 @@
+[2026-05-22 20:47] Started logging progress using the devlog tool: github.com/mostypc123/devlog
+[2026-05-22 20:48] Added launcher script wrapper for shorter URL: curl https://redroselinux.org/vm_launcher.sh | sh
+                   The script can be found in the redroselinux/redroselinux.github.io repo, as that is where the static site is hosted.
