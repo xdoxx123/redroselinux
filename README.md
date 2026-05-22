@@ -33,7 +33,7 @@ We currently use the runit init system (which we customized) and the nullinitrd 
 
 We made a launcher to launch Redrose in QEMU. To run it, paste this into your terminal:
 ```bash
-curl -sSSL https://raw.githubusercontent.com/redroselinux/redroselinux/refs/heads/main/src/redrose-launcher/main.py | python3
+curl https://redroselinux.org/vm_launcher.sh | sh
 ```
 **In case it says "invalid magic number" when booting, try clearing your `/var/cache` and re-running.** This usually happens when your download is corrupted.
 
