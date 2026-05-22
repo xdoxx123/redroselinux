@@ -1,5 +1,6 @@
 import os
 import subprocess
+import fix_usr_local
 
 """
 Bootstrap packages into rootfs/filesystem. Basically a very simple version of Car.
@@ -86,6 +87,7 @@ for i in packagelist.splitlines():
             f"| sed 's|^[^/]*/||' | grep -v '/$' > {save_path}",
             shell=True,
         )
+        fix_usr_local.check_and_fix()
         if result.returncode != 0:
             print(f"error: failed to unpack {tarball}")
             exit(1)
