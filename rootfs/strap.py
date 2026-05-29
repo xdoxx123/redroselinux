@@ -1,5 +1,6 @@
 import os
 import subprocess
+
 import fix_usr_local
 
 """
@@ -15,22 +16,20 @@ packagelist = ""
 try:
     packagelist = open("/etc/car/packagelist", "r").read()
 except:
-    print("car was not initialized. manually updating packagelist...")
+    print("  => Car not initialized, updating packagelist...")
     if (
         os.system(
             "sudo mkdir -p /etc/car && sudo curl -# -L -o /etc/car/packagelist https://github.com/redroselinux/car3-pkgs/raw/refs/heads/main/README"
         )
         != 0
     ):
-        print(
-            "failed to manually update packagelist. install car and init it (you will need --force)."
-        )
+        print("  => Failed to update packagelist")
         exit(1)
     else:
         try:
             packagelist = open("/etc/car/packagelist", "r").read()
         except:
-            print("still failed to read packagelist. error is fatal; exiting.")
+            print("  => Still failed to read packagelist")
             exit(1)
 
 currently_at_package = False
@@ -63,22 +62,21 @@ os.makedirs(f"{install_to}/etc/car/saves", exist_ok=True)
 
 for i in packagelist.splitlines():
     if i.startswith(f"{package} - "):
-        print("installing " + package)
+        print("=> Installing " + package)
         currently_at_package = True
         url = i.split(" - ")[1]
-        print("downloading " + url)
         tarball = "strap_packages/" + package + ".tar.zst"
         if not os.path.exists(tarball):
+            print("  -> " + tarball)
             os.system("curl -# -L -o " + tarball + " " + url)
 
         if recompress:
-            print("Recompressing package... (this may take a while)")
+            print("  ==> Recompressing " + package)
             os.system(f"zstd -d {tarball} -o /tmp/{package}.tar --force")
-            print("Decompressed .zst to .tar")
+            print("  ==> Decompressed .zst to .tar")
             os.system(f"gzip -f /tmp/{package}.tar")
-            print("Created compressed package.")
+            print("  -> " + install_to + "/" + package + ".tar.gz")
             os.system(f"mv /tmp/{package}.tar.gz {install_to}/{package}.tar.gz")
-            print("Moved recompressed package.")
             exit(0)
 
         save_path = install_to + "/etc/car/saves/" + package
@@ -89,28 +87,25 @@ for i in packagelist.splitlines():
         )
         fix_usr_local.check_and_fix()
         if result.returncode != 0:
-            print(f"error: failed to unpack {tarball}")
+            print("  ==> Error: failed to unpack " + package)
             exit(1)
         if compress:
-            print("Compressing package... (this may take a while)")
+            print("  ==> Compressing " + package)
             os.system(f"tar -cf /tmp/{package}.tar -C {install_to} .")
-            print("Created uncompressed package.")
             os.system(f"gzip -f /tmp/{package}.tar")
-            print("Created compressed package.")
+            print("  -> " + install_to + "/" + package + ".tar.gz")
             os.system(f"mv /tmp/{package}.tar.gz {install_to}/{package}.tar.gz")
-            print("Moved compressed package.")
             os.system(f"rm -rf {install_to}/usr")
 
     elif currently_at_package:
         if i.startswith("version "):
             version = i.split(" ")[1]
-            print("version " + version)
             with open("rootfs/filesystem/etc/repro.car", "a") as f:
                 f.write(package + "=" + version + "\n")
         break
 
 if not currently_at_package:
-    print("package not found")
+    print("  ==> Package not found")
     exit(1)
 
 os.system(f"rm -f {install_to}/car")

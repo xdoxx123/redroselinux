@@ -244,7 +244,7 @@ int create_users(char *username, char *password, char *root_password) {
     mkdir(home_dir, 0755);
 
     snprintf(useradd_cmd, sizeof(useradd_cmd),
-        "busybox chroot /mnt /bin/adduser -D -h /home/%s %s",
+        "busybox chroot /mnt /bin/busybox adduser -D -h /home/%s %s",
         username, username);
 
     if (system(useradd_cmd) != 0) {
