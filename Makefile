@@ -1,10 +1,13 @@
+ROOTFS_DIR = rootfs
 FS_DIR = filesystem
 INITRAMFS_DIR = initramfs
 OUTPUT_DIR = .
+ROOTFS_FS_DIR = $(ROOTFS_DIR)/$(FS_DIR)
 
 INITRAMFS_CPIO = $(OUTPUT_DIR)/initramfs.cpio
 INITRAMFS_GZ = $(OUTPUT_DIR)/initramfs.cpio.gz
 ISO = $(OUTPUT_DIR)/redrose_linux.iso
+QCOW2_IMG = redrose_linux.qcow2
 KERNEL = linux-7.0.3
 
 FEDORA := $(shell grep -q 'ID=fedora' /etc/os-release 2>/dev/null && echo 1 || echo 0)
@@ -19,12 +22,12 @@ help:
 
 dep:
 	@echo "=> Checking dependencies..."
-	@mkdir -p rootfs/filesystem/lib64
-	@mkdir -p rootfs/filesystem/lib
-	@mkdir -p rootfs/filesystem/usr/
-	@mkdir -p rootfs/filesystem/usr/lib
-	@mkdir -p rootfs/filesystem/usr/lib/grub
-	@cp -p /lib64/ld-linux-x86-64.so.2 rootfs/filesystem/lib64/
+	@mkdir -p $(ROOTFS_FS_DIR)/lib64
+	@mkdir -p $(ROOTFS_FS_DIR)/lib
+	@mkdir -p $(ROOTFS_FS_DIR)/usr/
+	@mkdir -p $(ROOTFS_FS_DIR)/usr/lib
+	@mkdir -p $(ROOTFS_FS_DIR)/usr/lib/grub
+	@cp -p /lib64/ld-linux-x86-64.so.2 $(ROOTFS_FS_DIR)/lib64/
 	@if [ "$(FEDORA)" = "1" ]; then \
 		cmd_list="grub2-mkrescue curl bash gzip gcc qemu-img qemu-system-x86_64 python3 cpio fakeroot xorriso strip file"; \
 	else \
@@ -44,8 +47,8 @@ dep:
 		fi; \
 	done
 	@echo ""
-	@echo "  => Running rootfs/copy_syslibs.py"
-	@python3 rootfs/copy_syslibs.py
+	@echo "  => Running $(ROOTFS_DIR)/copy_syslibs.py"
+	@python3 $(ROOTFS_DIR)/copy_syslibs.py
 
 initramfs: dep squash-root
 	@echo "==> Building initramfs..."
@@ -55,17 +58,17 @@ initramfs: dep squash-root
 		curl -s -L -o $(INITRAMFS_DIR)/bin/sgdisk https://github.com/redroselinux/car-coreutils-repo/raw/refs/heads/main/sgdisk-static-bin && \
 		chmod +x $(INITRAMFS_DIR)/bin/sgdisk \
 	)
-	@test -f initramfs/bin/mkfs.vfat || ( \
-		echo "  -> initramfs/bin/mkfs.vfat" && \
-		curl -s -L -o initramfs/bin/mkfs.vfat https://github.com/redroselinux/car-coreutils-repo/raw/refs/heads/main/mkfs.fat && \
-		chmod +x initramfs/bin/mkfs.vfat \
+	@test -f $(INITRAMFS_DIR)/bin/mkfs.vfat || ( \
+		echo "  -> $(INITRAMFS_DIR)/bin/mkfs.vfat" && \
+		curl -s -L -o $(INITRAMFS_DIR)/bin/mkfs.vfat https://github.com/redroselinux/car-coreutils-repo/raw/refs/heads/main/mkfs.fat && \
+		chmod +x $(INITRAMFS_DIR)/bin/mkfs.vfat \
 	)
 	@chmod +x $(INITRAMFS_DIR)/bin/init
 	@ln -sf bin/init $(INITRAMFS_DIR)/init
 	@chmod +x $(INITRAMFS_DIR)/bin/*
-	@chmod +x rootfs/filesystem/bin/*
-	@chmod +x rootfs/filesystem/bin/sh
-	@test -f rootfs/filesystem/bin/adduser && chmod +x rootfs/filesystem/bin/adduser || true
+	@chmod +x $(ROOTFS_FS_DIR)/bin/*
+	@chmod +x $(ROOTFS_FS_DIR)/bin/sh
+	@test -f $(ROOTFS_FS_DIR)/bin/adduser && chmod +x $(ROOTFS_FS_DIR)/bin/adduser || true
 	@chmod +x $(INITRAMFS_DIR)/init
 	@cd $(INITRAMFS_DIR) && find . -print0 | cpio --null -o -H newc > ../$(INITRAMFS_CPIO)
 	@gzip -f $(INITRAMFS_CPIO)
@@ -73,7 +76,7 @@ initramfs: dep squash-root
 
 strip-bins: dep install-packages
 	@echo "==> Stripping binaries..."
-	@find rootfs/filesystem/bin rootfs/filesystem/*/bin rootfs/filesystem/*/lib* -type f -exec file {} \; | \
+	@find $(ROOTFS_FS_DIR)/bin $(ROOTFS_FS_DIR)/*/bin $(ROOTFS_FS_DIR)/*/lib* -type f -exec file {} \; | \
 	grep -E 'ELF .* (executable|shared object)' | \
 	cut -d: -f1 | \
 	while read -r f; do \
@@ -83,56 +86,56 @@ strip-bins: dep install-packages
 
 install-packages: dep
 	@echo "==> Installing packages..."
-	@rm -f rootfs/filesystem/etc/redrose-strap
+	@rm -f $(ROOTFS_FS_DIR)/etc/redrose-strap
 	@while IFS= read -r line; do \
-	    echo "$$line" | python3 rootfs/strap.py; \
-	done < rootfs/rootfs_strap_packages
-	@echo "  -> rootfs/filesystem/etc/repro.car"
+	    echo "$$line" | python3 $(ROOTFS_DIR)/strap.py; \
+	done < $(ROOTFS_DIR)/rootfs_strap_packages
+	@echo "  -> $(ROOTFS_FS_DIR)/etc/repro.car"
 
 squash-root: dep
 	@echo "=> Merging /usr paths"
-	@mkdir -p rootfs/filesystem/usr/bin rootfs/filesystem/usr/sbin rootfs/filesystem/usr/lib rootfs/filesystem/usr/lib64
+	@mkdir -p $(ROOTFS_FS_DIR)/usr/bin $(ROOTFS_FS_DIR)/usr/sbin $(ROOTFS_FS_DIR)/usr/lib $(ROOTFS_FS_DIR)/usr/lib64
 	@echo "  ==> Copying /bin"
-	@[ -d rootfs/filesystem/bin ]   && cp -a rootfs/filesystem/bin/* rootfs/filesystem/usr/bin/ >/dev/null 2>&1 || true
+	@[ -d $(ROOTFS_FS_DIR)/bin ]   && cp -a $(ROOTFS_FS_DIR)/bin/* $(ROOTFS_FS_DIR)/usr/bin/ >/dev/null 2>&1 || true
 	@echo "  ==> Copying /sbin"
-	@[ -d rootfs/filesystem/sbin ]  && cp -a rootfs/filesystem/sbin/* rootfs/filesystem/usr/sbin/ >/dev/null 2>&1 || true
+	@[ -d $(ROOTFS_FS_DIR)/sbin ]  && cp -a $(ROOTFS_FS_DIR)/sbin/* $(ROOTFS_FS_DIR)/usr/sbin/ >/dev/null 2>&1 || true
 	@echo "  ==> Copying /lib"
-	@[ -d rootfs/filesystem/lib ]   && cp -a rootfs/filesystem/lib/* rootfs/filesystem/usr/lib/ >/dev/null 2>&1 || true
+	@[ -d $(ROOTFS_FS_DIR)/lib ]   && cp -a $(ROOTFS_FS_DIR)/lib/* $(ROOTFS_FS_DIR)/usr/lib/ >/dev/null 2>&1 || true
 	@echo "  ==> Copying /lib64"
-	@[ -d rootfs/filesystem/lib64 ] && cp -a rootfs/filesystem/lib64/* rootfs/filesystem/usr/lib64/ >/dev/null 2>&1 || true
+	@[ -d $(ROOTFS_FS_DIR)/lib64 ] && cp -a $(ROOTFS_FS_DIR)/lib64/* $(ROOTFS_FS_DIR)/usr/lib64/ >/dev/null 2>&1 || true
 	@echo "  ==> Removing original / paths"
-	@rm -rf rootfs/filesystem/bin rootfs/filesystem/sbin rootfs/filesystem/lib rootfs/filesystem/lib64
+	@rm -rf $(ROOTFS_FS_DIR)/bin $(ROOTFS_FS_DIR)/sbin $(ROOTFS_FS_DIR)/lib $(ROOTFS_FS_DIR)/lib64
 	@echo "  ==> Symlinking new /usr paths"
-	@ln -s usr/bin   rootfs/filesystem/bin
-	@ln -s usr/sbin  rootfs/filesystem/sbin
-	@ln -s usr/lib   rootfs/filesystem/lib
-	@ln -s usr/lib64 rootfs/filesystem/lib64
+	@ln -s usr/bin   $(ROOTFS_FS_DIR)/bin
+	@ln -s usr/sbin  $(ROOTFS_FS_DIR)/sbin
+	@ln -s usr/lib   $(ROOTFS_FS_DIR)/lib
+	@ln -s usr/lib64 $(ROOTFS_FS_DIR)/lib64
 	@echo "=> Symlinking /proc/mounts to /etc/mtab"
-	@ln -sf /proc/mounts rootfs/filesystem/etc/mtab
+	@ln -sf /proc/mounts $(ROOTFS_FS_DIR)/etc/mtab
 	@echo "=> Installing car"
-	@test -f rootfs/filesystem/bin/car || ( \
-		echo "  -> rootfs/filesystem/bin/car" && \
-		curl -s -L -o rootfs/filesystem/bin/car https://github.com/redroselinux/car/releases/latest/download/car && \
-		chmod +x rootfs/filesystem/bin/car \
+	@test -f $(ROOTFS_FS_DIR)/bin/car || ( \
+		echo "  -> $(ROOTFS_FS_DIR)/bin/car" && \
+		curl -s -L -o $(ROOTFS_FS_DIR)/bin/car https://github.com/redroselinux/car/releases/latest/download/car && \
+		chmod +x $(ROOTFS_FS_DIR)/bin/car \
 	)
-	@chmod +x rootfs/filesystem/sbin/reload-hostname-daemon
-	@mkdir -p rootfs/filesystem/lib64
-	@mkdir -p rootfs/filesystem/lib
-	@mkdir -p rootfs/filesystem/usr/
-	@mkdir -p rootfs/filesystem/usr/lib
-	@mkdir -p rootfs/filesystem/usr/lib/grub
+	@chmod +x $(ROOTFS_FS_DIR)/sbin/reload-hostname-daemon
+	@mkdir -p $(ROOTFS_FS_DIR)/lib64
+	@mkdir -p $(ROOTFS_FS_DIR)/lib
+	@mkdir -p $(ROOTFS_FS_DIR)/usr/
+	@mkdir -p $(ROOTFS_FS_DIR)/usr/lib
+	@mkdir -p $(ROOTFS_FS_DIR)/usr/lib/grub
 	@echo "=> Copying kernel image"
-	@cp $(KERNEL) rootfs/filesystem/boot/vmlinuz-$(KERNEL:linux-%=%)
-	@ln -sf vmlinuz-$(KERNEL:linux-%=%) rootfs/filesystem/boot/vmlinuz
-	@cp $(KERNEL) filesystem/boot/vmlinuz-$(KERNEL:linux-%=%)
-	@ln -sf vmlinuz-$(KERNEL:linux-%=%) filesystem/boot/vmlinuz
+	@cp $(KERNEL) $(ROOTFS_FS_DIR)/boot/vmlinuz-$(KERNEL:linux-%=%)
+	@ln -sf vmlinuz-$(KERNEL:linux-%=%) $(ROOTFS_FS_DIR)/boot/vmlinuz
+	@cp $(KERNEL) $(FS_DIR)/boot/vmlinuz-$(KERNEL:linux-%=%)
+	@ln -sf vmlinuz-$(KERNEL:linux-%=%) $(FS_DIR)/boot/vmlinuz
 	@echo "=> Creating rootfs tgz..."
 	@echo "  ==> Creating uncompressed rootfs.tar"
-	@fakeroot tar -cpf initramfs/rootfs.tar -C rootfs filesystem
+	@fakeroot tar -cpf $(INITRAMFS_DIR)/rootfs.tar -C $(ROOTFS_DIR) $(FS_DIR)
 	@echo "  ==> Compressing rootfs.tar"
-	@gzip -f initramfs/rootfs.tar
-	@rm -f initramfs/rootfs.tar
-	@echo "  -> initramfs/rootfs.tar.gz"
+	@gzip -f $(INITRAMFS_DIR)/rootfs.tar
+	@rm -f $(INITRAMFS_DIR)/rootfs.tar
+	@echo "  -> $(INITRAMFS_DIR)/rootfs.tar.gz"
 
 iso: squash-root initramfs
 	@echo "=> Building ISO..."
@@ -143,21 +146,21 @@ iso: squash-root initramfs
 	@echo "  -> $(ISO)"
 
 installer: dep
-	@$(CC) src/installer/main.c -o initramfs/bin/install -static 2>&1
-	@echo "  -> initramfs/bin/install"
-	@test -f src/welcome/main.c && $(CC) src/welcome/main.c -o rootfs/filesystem/bin/welcome && echo "  -> rootfs/filesystem/bin/welcome" || true
+	@$(CC) src/installer/main.c -o $(INITRAMFS_DIR)/bin/install -static 2>&1
+	@echo "  -> $(INITRAMFS_DIR)/bin/install"
+	@test -f src/welcome/main.c && $(CC) src/welcome/main.c -o $(ROOTFS_FS_DIR)/bin/welcome && echo "  -> $(ROOTFS_FS_DIR)/bin/welcome" || true
 
 run-installer:
 	@echo "=> Running installer..."
-	initramfs/bin/install
+	$(INITRAMFS_DIR)/bin/install
 
 clean:
 	@echo "=> Cleaning..."
-	@rm -f rootfs/filesystem/etc/repro.car
+	@rm -f $(ROOTFS_FS_DIR)/etc/repro.car
 	@rm -f $(INITRAMFS_CPIO) $(INITRAMFS_GZ) $(ISO)
-	@rm -f initramfs/bin/install filesystem/boot/initramfs.cpio.gz filesystem/boot/vmlinuz-* redrose_linux.qcow2
-	@rm -f rootfs/filesystem/boot/initramfs_rootfs.cpio.gz rootfs/filesystem/boot/vmlinuz-*
-	@rm -f initramfs_rootfs.cpio.gz initramfs_rootfs.cpio initramfs/rootfs.sqsh.
+	@rm -f $(INITRAMFS_DIR)/bin/install $(FS_DIR)/boot/initramfs.cpio.gz $(FS_DIR)/boot/vmlinuz-* $(QCOW2_IMG)
+	@rm -f $(ROOTFS_FS_DIR)/boot/initramfs_rootfs.cpio.gz $(ROOTFS_FS_DIR)/boot/vmlinuz-*
+	@rm -f initramfs_rootfs.cpio.gz initramfs_rootfs.cpio $(INITRAMFS_DIR)/rootfs.sqsh.
 	@echo "  => Done"
 
 clean-downloads:
@@ -169,14 +172,14 @@ bare-build: installer squash-root initramfs iso
 no-clean: installer squash-root initramfs iso vm
 short-build: installer squash-root initramfs iso vm
 
-installed-vm: ./redrose_linux.qcow2
+installed-vm: $(QCOW2_IMG)
 	@echo "=> Starting VM from disk..."
-	@qemu-system-x86_64 -drive file=redrose_linux.qcow2,format=qcow2 -m 2048 -boot c -enable-kvm -smp $$(nproc) -display gtk
+	@qemu-system-x86_64 -drive file=$(QCOW2_IMG),format=qcow2 -m 2048 -boot c -enable-kvm -smp $$(nproc) -display gtk
 
-vm: ./redrose_linux.iso
-	@echo "  -> redrose_linux.qcow2"
-	@qemu-img create -f qcow2 redrose_linux.qcow2 1G
+vm: $(ISO)
+	@echo "  -> $(QCOW2_IMG)"
+	@qemu-img create -f qcow2 $(QCOW2_IMG) 1G
 	@echo "  => Starting VM from ISO..."
-	@qemu-system-x86_64 -cdrom $(ISO) -drive file=redrose_linux.qcow2,format=qcow2 -m 2048 -boot d -enable-kvm -smp $$(nproc) -display gtk
+	@qemu-system-x86_64 -cdrom $(ISO) -drive file=$(QCOW2_IMG),format=qcow2 -m 2048 -boot d -enable-kvm -smp $$(nproc) -display gtk
 
 .PHONY: all initramfs iso clean vms installer run-installer clean-downloads clean-all bare-build no-clean vm help installed-vm squash-root dep
