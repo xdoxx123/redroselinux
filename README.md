@@ -85,13 +85,7 @@ Now in the Redrose directory, run:
 make
 ```
 
-or on Fedora:
-
-```
-make -f Makefile-fedora
-```
-
-This does all the magic, and even runs it in a VM.
+This does all the magic, and even runs it in a VM. Fedora is detected automatically.
 
 <div align=center>
 Wilted rose:<br>
