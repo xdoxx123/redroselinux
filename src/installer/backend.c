@@ -7,17 +7,17 @@
 #include <sys/sysmacros.h>
 #include <sys/mount.h>
 
-#include "common.h"
-#include "drive_uuid.h"
+#include "backend.h"
+#include "tui.h"
 #include <unistd.h>
 
-// backend for installer.
-//
-// was ai used in this file? yes
-//    (functions: list_dev, partition_drive, format_partitions, no_drives_repl, makefs)
+/* backend for installer.
+ *
+ * was ai used in this file? yes
+ *    (functions: list_dev, partition_drive, format_partitions, no_drives_repl, makefs) */
 
-// get the partition device file from the drive
-// takes the drive and partition number, returns the partition device file
+/* Get the partition device file from the drive.
+ * Takes the drive and partition number, returns the partition device file. */
 char* get_partition(const char* drive, int partnum) {
     static char buf[64];
     if (strncmp(drive, "/dev/nvme", 9) == 0 || strncmp(drive, "/dev/mmcblk", 11) == 0) {
@@ -28,7 +28,7 @@ char* get_partition(const char* drive, int partnum) {
     return buf;
 }
 
-// runs when no drive found
+/* Runs when no drive found. Starts a shell. */
 static inline void no_drives_repl(void) {
     set_text_color(RED);
     printf("- no drives found! ");
@@ -100,15 +100,15 @@ int list_devices(char *drives[64], int max) {
     return count;
 }
 
-// check if the computer is booted in BIOS or EFI mode
-// returns 64 on EFI and 32 on BIOS
-//
-// if /sys/firmware/efi exists, we are booted in efi
-// this is inspired by the archwiki where you check
-// this by uefi bitness, and it was 64 and 32. so i
-// put it in here because it looks super cool lmfao
-//
-// https://wiki.archlinux.org/title/Installation_guide#Verify_the_boot_mode
+/* Check if the computer is booted in BIOS or EFI mode.
+ * Returns 64 on EFI and 32 on BIOS.
+ *
+ * If /sys/firmware/efi exists, we are booted in efi.
+ * This is inspired by the archwiki where you check
+ * this by uefi bitness, and it was 64 and 32. so i
+ * put it in here because it looks super cool lmfao.
+ *
+ *  * https://wiki.archlinux.org/title/Installation_guide#Verify_the_boot_mode */
 int detect_efi() {
     int boot_mode;
 
@@ -119,7 +119,7 @@ int detect_efi() {
     }
 }
 
-// sanitize input for functions running a shell
+/* Sanitize input for functions running a shell. */
 int sanitize_input(char* input) {
     char *p = input;
     while (*p) {
@@ -131,7 +131,7 @@ int sanitize_input(char* input) {
     return 0;
 }
 
-// lists devices, returns the number of them
+/* Lists devices, returns the number of them. */
 int list_dev() {
     char *drives[64];
     int count = list_devices(drives, 64);
@@ -159,8 +159,8 @@ int wipe_drive(char* drive) {
     return system(command);
 }
 
-// creates filesystems and partitions
-// uses detect_efi() to create the boot partition (BIOS boot/ESP)
+/* Creates filesystems and partitions.
+ * Uses detect_efi() to create the boot partition (BIOS boot/ESP). */
 int makefs(char* drive) {
     char command[256];
 
@@ -211,7 +211,7 @@ int makefs(char* drive) {
     return system(command);
 }
 
-// mounts the installation drive and copies the root files to there
+/* Mounts the installation drive and copies the root files to there. */
 int copy_root(char* drive) {
     printf("  Mounting %s\n", get_partition(drive, 3));
     mount(get_partition(drive, 3), "/mnt", "ext2", 0, 0);
@@ -219,7 +219,7 @@ int copy_root(char* drive) {
     return system("busybox gzip -dc rootfs.tar.gz | busybox tar -xvf - -C /mnt --strip-components=1");
 }
 
-// create users, set root password
+/* Create users, set root password. */
 int create_users(char *username, char *password, char *root_password) {
     username[strcspn(username, "\n")] = '\0';
     if (username[0] == '\0') {
@@ -251,6 +251,7 @@ int create_users(char *username, char *password, char *root_password) {
         return 1;
     }
 
+    // fake print
     printf("adduser: created user '%s'\n", username);
 
     char sanitized[128];
@@ -278,8 +279,12 @@ int create_users(char *username, char *password, char *root_password) {
     return system(command);
 }
 
-// installs GRUB, checks for EFI/BIOS using detect_efi()
-// * https://man.voidlinux.org/grub-install
+/* Installs GRUB, checks for EFI/BIOS using detect_efi().
+ * A good source to look at grub-install:
+ *  * https://man.voidlinux.org/grub-install
+ *
+ * Argumets:
+ *  char* drive - the drive to install to */
 int install_grub(char* drive) {
     char command[1024];
     char grub_install[] = "busybox chroot /mnt /bin/sh -c '"
@@ -305,8 +310,11 @@ int install_grub(char* drive) {
     return system(command);
 }
 
-// enables propriertary software repo in car
-// * https://redroselinux.miraheze.org/wiki/Car_Package_Manager#Updating_the_system
+/* Enables propriertary software repo in car.
+ * Official car docs:
+ *   * https://docs.redroselinux.org/#/car?id=listup
+ * Additional information:
+ *   * https://docs.redroselinux.org/#/fhs?id=car_propiertarylock */
 int propriertary_(char*) {
     FILE *file = fopen("/mnt/etc/car_propiertary.lock", "w");
     if (file == NULL) {
@@ -317,9 +325,9 @@ int propriertary_(char*) {
     return 0;
 }
 
-// sanitizes and sets the hostname of the newly installed system
-// writes to /etc/hostname; init sets it in /proc automatically
-// * rootfs/filesystem/sbin/init
+/* Sanitizes and sets the hostname of the newly installed system.
+ * Writes to /etc/hostname; init sets it in /proc automatically.
+ * * rootfs/filesystem/sbin/init */
 int localhost(char *name) {
     const char *default_name = "iuseredrosebtw";
     char *hostname = name;
@@ -388,7 +396,8 @@ int localhost(char *name) {
     return 0;
 }
 
-// initialize car. since we do not have an internet connection, expect failure
+/* Initialize car. Since we do not have an internet connection, expect failure.
+ * Todo: intergrate this a little better? */
 int init_car(char*) {
     set_text_color(YELLOW);
     printf("THIS IS SUPPOSED TO FAIL. DO NOT MIND THE ERROR MESSAGES.\n");
@@ -397,6 +406,8 @@ int init_car(char*) {
     return 0;
 }
 
+/* Install coreutils and findutils based on user preference.
+ * Currently, we require Busybox, in multiple parts of the distro. */
 int install_utils(char*) {
     clear();
     int sel = install_utils_ui();
@@ -425,9 +436,9 @@ int install_utils(char*) {
     return 0;
 }
 
-// regenerate initramfs (nullinitrd) and fstab (mkfstab)
-// * src/mkfstab/src/generate.rs
-// * https://github.com/NULL-GNU-Linux/nullinitrd
+/* Regenerate initramfs (nullinitrd) and fstab (mkfstab).
+ * * https://docs.redroselinux.org/#/mkfstab
+ * * https://github.com/NULL-GNU-Linux/nullinitrd */
 int regenerate_initramfs_fstab(char*) {
     return system(
         "mount --bind /proc /mnt/proc && "
@@ -446,10 +457,10 @@ int regenerate_initramfs_fstab(char*) {
     );
 }
 
-// patches and fixes
-// currently does:
-// - fixes perms
-// - edits grub config
+/* Patches and fixes.
+ * Currently does:
+ * - fixes perms
+ * - edits grub config */
 int patch(char* drive) {
     printf("  Fixing permissions for some files\n");
     chmod("/mnt/etc/init.d/rcS", 0755);
@@ -458,7 +469,9 @@ int patch(char* drive) {
 
     printf("  Patching GRUB config to change root= entry\n");
     printf("  not finished - for now uses drive instead of uuid\n");
-    // not finished - for now uses drive instead of uuid
+    // TODO: not finished - for now uses drive instead of uuid
+    // TODO: it looks like the blkid outpoot is showing something else
+    // TODO: that the uuid we actually assigned; we will have a look at it.
     /* char uuid_cmd[256];
     char uuid[64] = {0};
     char *drive_ = get_partition(drive, 3);
@@ -487,7 +500,7 @@ int patch(char* drive) {
     return r;
 }
 
-// lets the user chroot into the newly installed system or run a shell in the live system
+/* Lets the user chroot into the newly installed system or run a shell in the live system. */
 int chroot_(char *h) {
     clear();
     installed_header();
@@ -513,8 +526,8 @@ int chroot_(char *h) {
     return 0;
 }
 
-// helper to unmount the root in main.c
-static int umount_detach(char *path) {
+/* Helper to unmount the root in main.c. */
+int umount_detach(char *path) {
     sync();
     if (umount2(path, MNT_DETACH) != 0) {
         return -1;

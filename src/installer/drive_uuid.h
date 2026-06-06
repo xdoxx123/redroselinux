@@ -1,8 +1,4 @@
 // was ai used in this file? yes
-//
-// this is a separate file because i used including source files
-// in other files so it kinda broke because of a problem like
-// this cannot use that -> backend.c <- include that
 
 #ifndef DRIVE_UUID_H
 #define DRIVE_UUID_H
@@ -25,8 +21,7 @@ typedef struct {
 } drive_uuid_t;
 
 
-static inline int _uuid_random_bytes(uint8_t *buf, size_t n)
-{
+static inline int _uuid_random_bytes(uint8_t *buf, size_t n) {
     int fd = open("/dev/urandom", O_RDONLY);
     if (fd < 0) return -1;
     ssize_t got = read(fd, buf, n);
@@ -35,8 +30,7 @@ static inline int _uuid_random_bytes(uint8_t *buf, size_t n)
 }
 
 
-static inline int uuid_generate(uuid_t *out)
-{
+static inline int uuid_generate(uuid_t *out) {
     if (_uuid_random_bytes(out->bytes, 16) != 0)
         return -1;
 
@@ -47,8 +41,7 @@ static inline int uuid_generate(uuid_t *out)
 }
 
 
-static inline void uuid_to_string(const uuid_t *id, char *dst)
-{
+static inline void uuid_to_string(const uuid_t *id, char *dst) {
     const uint8_t *b = id->bytes;
     snprintf(dst, 37,
         "%02x%02x%02x%02x-"
@@ -64,8 +57,7 @@ static inline void uuid_to_string(const uuid_t *id, char *dst)
 }
 
 
-static inline int assign_uuid_to_drive(const char *drive, drive_uuid_t *out)
-{
+static inline int assign_uuid_to_drive(const char *drive, drive_uuid_t *out) {
    memset(out, 0, sizeof(*out));
    strncpy(out->drive, drive, sizeof(out->drive) - 1);
 
@@ -87,8 +79,7 @@ static inline int assign_uuid_to_drive(const char *drive, drive_uuid_t *out)
    return 0;
 }
 
-static inline int uuid_drive(char *drive)
-{
+static inline int uuid_drive(char *drive) {
     drive_uuid_t tmp;
 
     if (assign_uuid_to_drive(drive, &tmp) != 0)
@@ -99,8 +90,7 @@ static inline int uuid_drive(char *drive)
     return 0;
 }
 
-static inline char *get_drive_uuid(const char *drive)
-{
+static inline char *get_drive_uuid(const char *drive) {
     char path[512];
     snprintf(path, sizeof(path), "%s/.drive_uuid", drive);
 

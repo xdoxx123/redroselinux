@@ -4,7 +4,8 @@
 #include <sys/ioctl.h>
 #include <stdlib.h>
 #include <termios.h>
-#include "common.h"
+#include "tui.h"
+#include "backend.h"
 
 // this file includes functions for TUI and some
 // TUI parts for main.c.
