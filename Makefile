@@ -146,7 +146,7 @@ iso: squash-root initramfs
 	@echo "  -> $(ISO)"
 
 installer: dep
-	@$(CC) src/installer/main.c -o $(INITRAMFS_DIR)/bin/install -static 2>&1
+	@$(CC) src/installer/main.c src/installer/tui.c src/installer/backend.c -o $(INITRAMFS_DIR)/bin/install -static 2>&1
 	@echo "  -> $(INITRAMFS_DIR)/bin/install"
 	@test -f src/welcome/main.c && $(CC) src/welcome/main.c -o $(ROOTFS_FS_DIR)/bin/welcome && echo "  -> $(ROOTFS_FS_DIR)/bin/welcome" || true
 
@@ -171,6 +171,7 @@ clean-all: clean clean-downloads
 bare-build: installer squash-root initramfs iso
 no-clean: installer squash-root initramfs iso vm
 short-build: installer squash-root initramfs iso vm
+no-strip: dep clean installer install-packages squash-root initramfs iso vm
 
 installed-vm: $(QCOW2_IMG)
 	@echo "=> Starting VM from disk..."
