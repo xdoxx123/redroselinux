@@ -29,8 +29,6 @@ We currently use the runit init system (which we customized) and the nullinitrd 
 
 ## Download
 
-> https://redroselinux.miraheze.org/wiki/Installation#Obtaining_a_disk_image
-
 We made a launcher to launch Redrose in QEMU. To run it, paste this into your terminal:
 ```bash
 curl https://redroselinux.org/vm_launcher.sh | sh
@@ -40,8 +38,6 @@ curl https://redroselinux.org/vm_launcher.sh | sh
 This uses the latest **release**.
 
 Otherwise, download from the Releases tab.
-
-> https://redroselinux.miraheze.org/wiki/Installation
 
 ## Hardware Requirements
 
@@ -58,24 +54,12 @@ If you wish to edit the installer code, run from source tree:
 python3 enable_debug.py
 ```
 
-### nightly
-
-> https://redroselinux.miraheze.org/wiki/Installation_(nightly)
-
-To compile the nightly version, clone `mostypc123/redroselinux` and compile:
-
-```
-make
-```
-
-### stable
+**WE WILL MAKE A KERNEL PACKAGE; THIS WILL BE OUTDATED SOON**
 
 To build Redrose Linux, first build a Linux kernel.
 - clone the source
 - `make defconfig`
 - `make -j$(nproc)`
-- move the generated kernel image to ./linuxImage.
-- this repo has a precompiled kernel image FOR THE CI.
 
 **You can use the prebuilt**, but it is recommended to build it for yourself. On my PC with 12 cores, it takes about 3 minutes.
 
