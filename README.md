@@ -79,11 +79,15 @@ Wilted rose:<br>
 ## Other components
 
 - **Car** (package manager): https://github.com/redroselinux/car
-- **redrosectl** (idk): https://github.com/redroselinux/redrosectl
+- **news-reader**: https://github.com/redroselinux/news-reader
+- **Fuel** (package builder): https://github.com/redroselinux/fuel
+- **redrose-runit**: https://github.com/redroselinux/redrose-runit
+- **Website source code**: https://github.com/redroselinux/redroselinux.github.io
+  deployed to both the new .org site and the old .is-a.software
 
 ## Contact
 
-- **Email**: mostypc7@gmail.com
+- **Email**: admin@redroselinux.org
 
 ## Random stats no one reads
 
