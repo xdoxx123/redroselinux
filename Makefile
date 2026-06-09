@@ -171,7 +171,7 @@ clean-all: clean clean-downloads
 bare-build: installer squash-root initramfs iso
 no-clean: installer squash-root initramfs iso vm
 short-build: installer squash-root initramfs iso vm
-no-strip: dep clean installer install-packages squash-root initramfs iso vm
+no-strip: dep clean installer install-packages strip-bins squash-root initramfs iso vm
 
 installed-vm: $(QCOW2_IMG)
 	@echo "=> Starting VM from disk..."
