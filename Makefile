@@ -129,6 +129,8 @@ squash-root: dep
 	@ln -sf vmlinuz-$(KERNEL:linux-%=%) $(ROOTFS_FS_DIR)/boot/vmlinuz
 	@cp $(KERNEL) $(FS_DIR)/boot/vmlinuz-$(KERNEL:linux-%=%)
 	@ln -sf vmlinuz-$(KERNEL:linux-%=%) $(FS_DIR)/boot/vmlinuz
+	@echo "=> Running ldconfig"
+	@ldconfig -r rootfs/filesystem
 	@echo "=> Creating rootfs tgz..."
 	@echo "  ==> Creating uncompressed rootfs.tar"
 	@fakeroot tar -cpf $(INITRAMFS_DIR)/rootfs.tar -C $(ROOTFS_DIR) $(FS_DIR)
