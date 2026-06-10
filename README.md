@@ -54,15 +54,6 @@ If you wish to edit the installer code, run from source tree:
 python3 enable_debug.py
 ```
 
-**WE WILL MAKE A KERNEL PACKAGE; THIS WILL BE OUTDATED SOON**
-
-To build Redrose Linux, first build a Linux kernel.
-- clone the source
-- `make defconfig`
-- `make -j$(nproc)`
-
-**You can use the prebuilt**, but it is recommended to build it for yourself. On my PC with 12 cores, it takes about 3 minutes.
-
 Now in the Redrose directory, run:
 
 ```
