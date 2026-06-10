@@ -50,6 +50,24 @@ if ":" in package:
     package = parts[0]
     install_to = parts[1]
 
+    if package == "remove":
+        package = parts[1]
+        print(f"=> Uninstalling {package}")
+
+        # read the save file
+        save = ""
+        with open(f"rootfs/filesystem/etc/car/saves/{package}", "r") as f:
+            save = f.read()
+
+        # delete all the files
+        for line in save.splitlines():
+            if line == "car":
+                continue  # skip file already deleted
+
+            file_to_delete = "rootfs/filesystem/" + line
+            os.remove(file_to_delete)
+        exit()
+
     if len(parts) >= 3:
         if parts[2] == "compress-installed-folder":
             compress = True

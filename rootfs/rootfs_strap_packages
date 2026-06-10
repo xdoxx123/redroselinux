@@ -4,6 +4,11 @@
 -- syntax: <package>:[optional install_path]:[optional compress-installed-folder/recompress]
 --      requires car    gets auto-created                 always using tar&gzip
 
+-- packages get cached into strap_packages/. delete files from there to redownload.
+-- to delete packages, run rootfs/strap.py and enter:
+-- remove:package
+-- unless not absolutely required, do not do that in this file.
+
 acl
 attr
 binutils
@@ -37,8 +42,8 @@ mkfstab
 openssl
 pcre2
 readline
--- This package fails to install..
--- Works when manual build and manual unpacking
+-- redrose-runit fails to install..
+-- works on manual build and manual unpacking
 redrose-runit
 sed
 tar
