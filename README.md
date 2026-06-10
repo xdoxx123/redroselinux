@@ -33,7 +33,7 @@ We made a launcher to launch Redrose in QEMU. To run it, paste this into your te
 ```bash
 curl https://redroselinux.org/vm_launcher.sh | sh
 ```
-**In case it says "invalid magic number" when booting, try clearing your `/var/cache` and re-running.** This usually happens when your download is corrupted.
+**In case it says "invalid magic number" when booting, try clearing your `~/.cache` and re-running.** This usually happens when your download is corrupted.
 
 This uses the latest **release**.
 
