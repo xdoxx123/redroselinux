@@ -27,10 +27,14 @@ void error() {
     if (fgets(buf, sizeof(buf), stdin)) {
         if (buf[0] == 'r' || buf[0] == 'R') {
             execv("/bin/install", NULL);
+            perror("execv");
+            _exit(1);
         } else if (buf[0] == 's' || buf[0] == 'S') {
             shutdown_computer();
         } else {
             execv("/bin/install", NULL);
+            perror("execv");
+            _exit(1);
         }
     }
 }
@@ -89,6 +93,11 @@ int main() {
     clear();
     char* username = user_creation();
     char* userpassword = user_password();
+    if (!userpassword) {
+        userpassword = malloc(100);
+        if (!userpassword) { perror("malloc"); exit(1); }
+        strcpy(userpassword, "redrose\n");
+    }
     if (userpassword[0] == '\n' || userpassword[0] == '\0') {
         set_text_color(RED);
         printf("REMEMBER THE DEFAULT PASSWORD ABOVE!\n");
@@ -96,6 +105,11 @@ int main() {
     }
 
     char* rootpassword = root_password();
+    if (!rootpassword) {
+        rootpassword = malloc(100);
+        if (!rootpassword) { perror("malloc"); exit(1); }
+        strcpy(rootpassword, "redrose\n");
+    }
     if (rootpassword[0] == '\n' || rootpassword[0] == '\0') {
         set_text_color(RED);
         printf("REMEMBER THE DEFAULT PASSWORD ABOVE!\n");
@@ -202,6 +216,8 @@ int main() {
             } else {
                 clear();
                 execl("/bin/install", "install", NULL);
+                perror("execl");
+                _exit(1);
             }
         }
     }

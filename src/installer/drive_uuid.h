@@ -24,9 +24,14 @@ typedef struct {
 static inline int _uuid_random_bytes(uint8_t *buf, size_t n) {
     int fd = open("/dev/urandom", O_RDONLY);
     if (fd < 0) return -1;
-    ssize_t got = read(fd, buf, n);
+    size_t total = 0;
+    while (total < n) {
+        ssize_t got = read(fd, buf + total, n - total);
+        if (got <= 0) { close(fd); return -1; }
+        total += (size_t)got;
+    }
     close(fd);
-    return (got == (ssize_t)n) ? 0 : -1;
+    return 0;
 }
 
 
@@ -60,6 +65,7 @@ static inline void uuid_to_string(const uuid_t *id, char *dst) {
 static inline int assign_uuid_to_drive(const char *drive, drive_uuid_t *out) {
    memset(out, 0, sizeof(*out));
    strncpy(out->drive, drive, sizeof(out->drive) - 1);
+   out->drive[sizeof(out->drive) - 1] = '\0';
 
    if (uuid_generate(&out->id) != 0)
        return -1;
@@ -69,9 +75,12 @@ static inline int assign_uuid_to_drive(const char *drive, drive_uuid_t *out) {
    char path[512];
    snprintf(path, sizeof(path), "%s/.drive_uuid", drive);
 
-   FILE *f = fopen(path, "w");
-   if (!f)
+   int fd = open(path, O_WRONLY | O_CREAT | O_EXCL, 0644);
+   if (fd < 0)
        return -1;
+
+   FILE *f = fdopen(fd, "w");
+   if (!f) { close(fd); return -1; }
 
    fprintf(f, "%s\n", out->uuid_str);
    fclose(f);

@@ -19,7 +19,7 @@
 /* Get the partition device file from the drive.
  * Takes the drive and partition number, returns the partition device file. */
 char* get_partition(const char* drive, int partnum) {
-    static char buf[64];
+    static __thread char buf[64];
     if (strncmp(drive, "/dev/nvme", 9) == 0 || strncmp(drive, "/dev/mmcblk", 11) == 0) {
         snprintf(buf, sizeof(buf), "%sp%d", drive, partnum);
     } else {
@@ -64,6 +64,7 @@ int list_devices(char *drives[64], int max) {
                        &maj, &min, dev) == 3) {
                 if (maj == cur_maj && min == cur_min) {
                     strncpy(cur_dev, dev, sizeof(cur_dev) - 1);
+                    cur_dev[sizeof(cur_dev) - 1] = '\0';
                     break;
                 }
             }
@@ -85,10 +86,11 @@ int list_devices(char *drives[64], int max) {
         if (cur_dev[0] && strstr(cur_dev, name))
             continue;
 
-        char *path = malloc(32);
+        size_t plen = strlen(name) + 6;
+        char *path = malloc(plen);
         if (!path)
             break;
-        snprintf(path, 32, "/dev/%s", name);
+        snprintf(path, plen, "/dev/%s", name);
         drives[count++] = path;
     }
 
@@ -123,7 +125,10 @@ int detect_efi() {
 int sanitize_input(char* input) {
     char *p = input;
     while (*p) {
-        if (*p == '$' || *p == '(' || *p == ')' || *p == ';' || *p == '\'') {
+        if (*p == '$' || *p == '(' || *p == ')' || *p == ';' || *p == '\'' ||
+            *p == '"' || *p == '`' || *p == '|' || *p == '&' || *p == '\n' ||
+            *p == '<' || *p == '>' || *p == '\\' || *p == '!' ||
+            *p == '{' || *p == '}' || *p == '[' || *p == ']') {
             *p = '_';
         }
         p++;
@@ -153,6 +158,7 @@ int list_dev() {
 
 int wipe_drive(char* drive) {
     char command[256];
+    sanitize_input(drive);
     snprintf(command, sizeof(command), "sgdisk --zap-all %s", drive);
     printf("> %s\n", command);
     fflush(stdout);
@@ -163,6 +169,7 @@ int wipe_drive(char* drive) {
  * Uses detect_efi() to create the boot partition (BIOS boot/ESP). */
 int makefs(char* drive) {
     char command[256];
+    sanitize_input(drive);
 
     if (detect_efi() == 32) {
         snprintf(command, sizeof(command),
@@ -214,7 +221,10 @@ int makefs(char* drive) {
 /* Mounts the installation drive and copies the root files to there. */
 int copy_root(char* drive) {
     printf("  Mounting %s\n", get_partition(drive, 3));
-    mount(get_partition(drive, 3), "/mnt", "ext2", 0, 0);
+    if (mount(get_partition(drive, 3), "/mnt", "ext2", 0, 0) != 0) {
+        perror("mount");
+        return 1;
+    }
     printf("  Extracting /rootfs.tar.gz to /mnt. This may take a while...\n");
     return system("busybox gzip -dc rootfs.tar.gz | busybox tar -xvf - -C /mnt --strip-components=1");
 }
@@ -222,6 +232,7 @@ int copy_root(char* drive) {
 /* Create users, set root password. */
 int create_users(char *username, char *password, char *root_password) {
     username[strcspn(username, "\n")] = '\0';
+    sanitize_input(username);
     if (username[0] == '\0') {
         strcpy(username, "redrose");
     }
@@ -293,11 +304,15 @@ int install_grub(char* drive) {
         "busybox mkdir -p /sys &&mount -t sysfs sys /sys && "
         "busybox mkdir -p /dev &&mount -t devtmpfs dev /dev && "
         "grub-install";
+    sanitize_input(drive);
     if (detect_efi() == 64) {
         printf("Mounting ESP\n");
         system("busybox mkdir -p /boot/");
         system("busybox mkdir -p /boot/efi");
-        mount(get_partition(drive, 2), "/boot/efi", "vfat", 0, 0);
+        if (mount(get_partition(drive, 2), "/boot/efi", "vfat", 0, 0) != 0) {
+            perror("mount");
+            return 1;
+        }
         snprintf(command, sizeof(command),
             "%s --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck %s --directory=/lib/grub/x86_64-efi'",
             grub_install, drive
@@ -462,6 +477,7 @@ int regenerate_initramfs_fstab(char*) {
  * - fixes perms
  * - edits grub config */
 int patch(char* drive) {
+    sanitize_input(drive);
     printf("  Fixing permissions for some files\n");
     chmod("/mnt/etc/init.d/rcS", 0755);
     chmod("/mnt/bin/su", 4755);

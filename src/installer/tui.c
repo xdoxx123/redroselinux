@@ -113,18 +113,17 @@ void enter_continue(void) {
     printf(" ENTER ");
     set_text_color(RESET);
     printf("to continue...");
-    if (DEBUG == 0) {
-        disable_echo();
-    }
+    disable_echo();
     if (fgets(command, sizeof(command), stdin) && strlen(command) > 1) {
         if (DEBUG == 1) {
+            sanitize_input(command);
             system(command);
+            enable_echo();
             enter_continue();
+            return;
         }
     }
-    if (DEBUG == 0) {
-        enable_echo();
-    }
+    enable_echo();
     clear();
 }
 
@@ -250,7 +249,8 @@ void main_header(void) {
 
 char* localization_header(void) {
     printf("step 2/6");
-    char *layout = malloc(100); // heap-allocated buffer
+    char *layout = malloc(100);
+    if (!layout) { perror("malloc"); exit(1); }
 
     set_text_color(YELLOW);
     printf(
@@ -284,8 +284,10 @@ char* localization_header(void) {
 char* language(void) {
     printf("Language [us]: ");
     char *lang = malloc(100);
+    if (!lang) { perror("malloc"); exit(1); }
     if (fgets(lang, 100, stdin) == NULL) {
         perror("Could not read input");
+        strcpy(lang, "us");
     }
     return lang;
 }
@@ -293,8 +295,10 @@ char* language(void) {
 char* timezone(void) {
     printf("Timezone (enter name of your city or country or UTC+/-*) [UTC+0]: ");
     char *time = malloc(100);
+    if (!time) { perror("malloc"); exit(1); }
     if (fgets(time, 100, stdin) == NULL) {
         perror("Could not read input");
+        strcpy(time, "UTC+0");
     }
     return time;
 }
@@ -413,6 +417,7 @@ char* disk_header(void) {
 
 char* user_creation(void) {
     char *username = malloc(100);
+    if (!username) { perror("malloc"); exit(1); }
     printf("step 4/6");
     set_text_color(YELLOW);
     printf(
@@ -479,6 +484,7 @@ char* root_password(void) {
 
 char* hostname(void) {
     char *password = malloc(100);
+    if (!password) { perror("malloc"); exit(1); }
     printf("Hostname [iuseredrosebtw]: ");
     fgets(password, 100, stdin);
     return password;
