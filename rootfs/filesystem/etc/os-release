@@ -1,9 +1,9 @@
 NAME="Redrose Linux"
-VERSION="Alpha 0.5 (Garden Gate)"
+VERSION="Alpha 0.5.1 (Thorns)"
 ID=redrose
-VERSION_CODENAME=garden-gate
-PRETTY_NAME="Redrose Linux Alpha 0.5 (Garden Gate)"
-VERSION_ID="alpha0.5"
+VERSION_CODENAME=thorns
+PRETTY_NAME="Redrose Linux Alpha 0.5.1 (Thorns)"
+VERSION_ID="alpha-0.5.1"
 HOME_URL="https://redroselinux.org/"
 SUPPORT_URL="https://docs.redroselinux.org"
 BUG_REPORT_URL="https://github.com/redroselinux/redroselinux/issues"
