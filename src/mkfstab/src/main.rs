@@ -1,6 +1,5 @@
 use std::env;
 use std::fs;
-use std::fs::File;
 use std::io::Write;
 use std::process::exit;
 mod generate;
@@ -12,7 +11,7 @@ fn usage(short: bool) {
         println!("Options:");
         println!("  -h, --help     Print this help message");
         println!("  -o, --output   Output file path (default: /etc/fstab)");
-        println!("  -P, --pseudo   Include pseoudo filesystems (false if not passed)");
+        println!("  -P, --pseudo   Include pseudo filesystems (false if not passed)");
         println!("  --yes          Automatically say yes to every prompt");
         println!("  --no           Automatically say no to every prompt");
         println!("");
@@ -55,9 +54,11 @@ fn main() {
                 }
             }
             _ => {
-                if !argv[i].starts_with('-') {
-                    root = argv[i].as_str();
+                if argv[i].starts_with('-') {
+                    eprintln!("error: unknown option '{}'", argv[i]);
+                    exit(1);
                 }
+                root = argv[i].as_str();
             }
         }
         i += 1;
@@ -86,9 +87,7 @@ fn main() {
                 exit(0);
             }
         }
-        Err(_) => {
-            File::create(output).expect("failed to create output file");
-        }
+        Err(_) => {}
     }
 
     generate::generate_fstab(output, root, pseudo);
