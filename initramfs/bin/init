@@ -1,19 +1,23 @@
 #!/bin/sh
 
 # Mount essential filesystems
-echo "\033[96m*\033[0m Mounting essential filesystems"
-mkdir -p /proc
-mkdir -p /run
-mount -t proc none /proc
-mkdir -p /sys
-mount -t sysfs none /sys
-mount -t devtmpfs none /dev
+echo -e "\033[96m*\033[0m Mounting essential filesystems"
+busybox mkdir -p /proc
+busybox mkdir -p /run
+mount -t proc proc /proc
+busybox mkdir -p /sys
+mount -t sysfs sysfs /sys
+mount -t devtmpfs devtmpfs /dev
 
 # Set up PATH
-echo "\033[96m*\033[0m Setting up PATH"
+echo -e "\033[96m*\033[0m Setting up PATH"
 export PATH=/bin
 
-mdev -s
+busybox mdev -s
 
 # Launch installer
 exec /bin/install
+exec /bin/sh
+cp /bin/busybox /bin/sh && exec /bin/sh
+
+echo -e "\033[91mFailed to exec. Tried install and sh.\033[0m"
