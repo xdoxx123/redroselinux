@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-version=0.1.0
+version=1.0
 
 rm -rf package
 cargo build --release
