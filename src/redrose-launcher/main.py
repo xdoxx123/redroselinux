@@ -32,6 +32,7 @@ from gi.repository import GLib, Gtk
 
 ISO_DIR = f"{os.environ.get('HOME')}/.cache"
 VERSIONS = {
+	"alpha-0.5.1": "https://github.com/redroselinux/redroselinux/releases/download/alpha0.5.1/redrose_linux.iso",
     "alpha-0.5": "https://github.com/redroselinux/redroselinux/releases/download/alpha0.5/redrose_linux.iso",
     "alpha-0.4.2": "https://github.com/redroselinux/redroselinux/releases/download/alpha0.4.2/redrose_linux.iso",
     "alpha-0.4.1": "https://github.com/redroselinux/redroselinux/releases/download/alpha0.4.1/redrose_linux.iso",
