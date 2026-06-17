@@ -114,14 +114,20 @@ void enter_continue(void) {
     set_text_color(RESET);
     printf("to continue...");
     disable_echo();
-    if (fgets(command, sizeof(command), stdin) && strlen(command) > 1) {
-        if (DEBUG == 1) {
-            sanitize_input(command);
-            system(command);
-            enable_echo();
-            enter_continue();
-            return;
-        }
+
+    // For debugging purposes, let user run commands
+    // when DEBUG is 1. This is not shipped to
+    // usual builds; it is for debugging.
+    if (
+        DEBUG == 1 && fgets(
+            command, sizeof(command), stdin
+        ) && strlen(command) > 1
+    ) {
+        sanitize_input(command);
+        system(command);
+        enable_echo();
+        enter_continue();
+        return;
     }
     enable_echo();
     clear();
