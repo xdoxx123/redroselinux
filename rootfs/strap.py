@@ -11,10 +11,6 @@ Usage:
     echo "package" | python3 strap.py
 Prints an error message and exits 1 if package is not found.
 On success, prints the version of the package and adds it to rootfs/filesystem/etc/repro.car, then exits 0.
-
----
-The downloaded packages are controlled by Redrose Linux and are not "arbitrary". Stop telling me this
-is a vulnerability because it is not.
 """
 
 
@@ -58,7 +54,7 @@ except FileNotFoundError, OSError, IOError:
     print("  => Car not initialized, updating packagelist...")
     if (
         exec(
-            "sudo mkdir -p /etc/car && sudo curl -# -L -o /etc/car/packagelist https://github.com/redroselinux/car3-pkgs/raw/refs/heads/main/README",
+            "sudo mkdir -p /etc/carsudo curl -# -L -o /etc/car/packagelist https://github.com/redroselinux/car3-pkgs/raw/refs/heads/main/README",
             shell=True,
         )
         != 0
@@ -132,12 +128,6 @@ for i in packagelist.splitlines():
             exec("curl -# -L -o " + tarball + " " + url)
 
         if recompress:
-            if os.path.islink(f"/tmp/{package}.tar") or os.path.islink(
-                f"/tmp/{package}.tar.gz"
-            ):
-                print("\033[91mRefusing to operate on symlink.\033[0m")
-                sys.exit(1)
-
             print("  ==> Recompressing " + package)
             exec(f"zstd -d {tarball} -o /tmp/{package}.tar --force")
             print("  ==> Decompressed .zst to .tar")
@@ -162,7 +152,7 @@ for i in packagelist.splitlines():
             exec(f"gzip -f /tmp/{package}.tar")
             print("  -> " + install_to + "/" + package + ".tar.gz")
             exec(f"mv /tmp/{package}.tar.gz {install_to}/{package}.tar.gz")
-            os.removedirs(f"{install_to}/usr")
+            os.removedirs(f"rm -rf {install_to}/usr")
 
     elif currently_at_package:
         if i.startswith("version "):

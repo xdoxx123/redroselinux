@@ -21,6 +21,7 @@ void error() {
     printf("\n");
     enable_echo();
 
+
     char buf[8];
     printf("Do you want to restart the installer or shutdown? [R/s] ");
     if (fgets(buf, sizeof(buf), stdin)) {
@@ -172,15 +173,6 @@ int main() {
             enable_echo();
         }
 
-        free(keyboard);
-        free(lang);
-        free(time);
-        free(drive);
-        free(username);
-        free(userpassword);
-        free(rootpassword);
-        free(host_name);
-
         if (success) {
             installed_header();
             printf("Thank you for installing the Redrose Linux alpha! Reboot to your new system.\n");
@@ -229,3 +221,15 @@ int main() {
             }
         }
     }
+
+cleanup_free:
+    free(keyboard);
+    free(lang);
+    free(time);
+    free(drive);
+    free(username);
+    free(userpassword);
+    free(rootpassword);
+    free(host_name);
+    return 0;
+}

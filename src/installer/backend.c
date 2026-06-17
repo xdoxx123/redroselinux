@@ -16,12 +16,6 @@
  * was ai used in this file? yes
  *    (functions: list_dev, partition_drive, format_partitions, no_drives_repl, makefs) */
 
-/* Simple wrapper for system() with sanitized input. */
-int exec(char* in) {
-    sanitize_input(in);
-    return system(in);
-}
-
 /* Get the partition device file from the drive.
  * Takes the drive and partition number, returns the partition device file. */
 char* get_partition(const char* drive, int partnum) {
@@ -36,8 +30,6 @@ char* get_partition(const char* drive, int partnum) {
 
 /* Runs when no drive found. Starts a shell. */
 static inline void no_drives_repl(void) {
-    // yes, some people did tell me this is a vulnerability
-    // THIS IS A LIVE ISO NOT A "ROOT EXPLOIT"
     set_text_color(RED);
     printf("- no drives found! ");
     set_text_color(RESET);
@@ -170,7 +162,7 @@ int wipe_drive(char* drive) {
     snprintf(command, sizeof(command), "sgdisk --zap-all %s", drive);
     printf("> %s\n", command);
     fflush(stdout);
-    return exec(command);
+    return system(command);
 }
 
 /* Creates filesystems and partitions.
@@ -185,7 +177,7 @@ int makefs(char* drive) {
         );
         printf("> %s\n", command);
         fflush(stdout);
-        if (exec(command) != 0)
+        if (system(command) != 0)
             return 1;
     } else {
         snprintf(command, sizeof(command),
@@ -193,7 +185,7 @@ int makefs(char* drive) {
         );
         printf("> %s\n", command);
         fflush(stdout);
-        if (exec(command) != 0)
+        if (system(command) != 0)
             return 1;
     }
 
@@ -202,13 +194,13 @@ int makefs(char* drive) {
     );
     printf("> %s\n", command);
     fflush(stdout);
-    if (exec(command) != 0)
+    if (system(command) != 0)
         return 1;
 
     snprintf(command, sizeof(command), "busybox partprobe %s", drive);
     printf("> %s\n", command);
     fflush(stdout);
-    if (exec(command) != 0)
+    if (system(command) != 0)
         return 1;
 
     char *efi_part = get_partition(drive, 2);
@@ -217,13 +209,13 @@ int makefs(char* drive) {
     snprintf(command, sizeof(command), "mkfs.vfat -F32 %s", efi_part);
     printf("> %s\n", command);
     fflush(stdout);
-    if (exec(command) != 0)
+    if (system(command) != 0)
         return 1;
 
     snprintf(command, sizeof(command), "busybox mke2fs -F %s", root_part);
     printf("> %s\n", command);
     fflush(stdout);
-    return exec(command);
+    return system(command);
 }
 
 /* Mounts the installation drive and copies the root files to there. */
@@ -266,7 +258,7 @@ int create_users(char *username, char *password, char *root_password) {
         "busybox chroot /mnt /bin/busybox adduser -D -h /home/%s %s",
         username, username);
 
-    if (exec(useradd_cmd) != 0) {
+    if (system(useradd_cmd) != 0) {
         return 1;
     }
 
@@ -283,7 +275,7 @@ int create_users(char *username, char *password, char *root_password) {
         "busybox chroot /mnt /bin/sh -c 'echo \"%s:%s\" | busybox chpasswd'",
         username, sanitized);
 
-    if (exec(command) != 0) {
+    if (system(command) != 0) {
         return 1;
     }
 
@@ -295,7 +287,7 @@ int create_users(char *username, char *password, char *root_password) {
         "busybox chroot /mnt /bin/sh -c 'echo \"root:%s\" | busybox chpasswd'",
         sanitized);
 
-    return exec(command);
+    return system(command);
 }
 
 /* Installs GRUB, checks for EFI/BIOS using detect_efi().
@@ -330,7 +322,7 @@ int install_grub(char* drive) {
             "%s --target=i386-pc --recheck %s' --directory=/lib/grub/i386-pc", grub_install, drive
         );
     }
-    return exec(command);
+    return system(command);
 }
 
 /* Enables propriertary software repo in car.
