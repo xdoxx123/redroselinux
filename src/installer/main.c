@@ -26,14 +26,14 @@ void error() {
     printf("Do you want to restart the installer or shutdown? [R/s] ");
     if (fgets(buf, sizeof(buf), stdin)) {
         if (buf[0] == 'r' || buf[0] == 'R') {
-            execv("/bin/install", NULL);
-            perror("execv");
+            execl("/bin/install", "install", NULL);
+            perror("execl");
             _exit(1);
         } else if (buf[0] == 's' || buf[0] == 'S') {
             shutdown_computer();
         } else {
-            execv("/bin/install", NULL);
-            perror("execv");
+            execl("/bin/install", "install", NULL);
+            perror("execl");
             _exit(1);
         }
     }

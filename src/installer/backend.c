@@ -128,7 +128,8 @@ int sanitize_input(char* input) {
         if (*p == '$' || *p == '(' || *p == ')' || *p == ';' || *p == '\'' ||
             *p == '"' || *p == '`' || *p == '|' || *p == '&' || *p == '\n' ||
             *p == '<' || *p == '>' || *p == '\\' || *p == '!' ||
-            *p == '{' || *p == '}' || *p == '[' || *p == ']') {
+            *p == '{' || *p == '}' || *p == '[' || *p == ']' ||
+            *p == '*' || *p == '?' || *p == '#' || *p == '~') {
             *p = '_';
         }
         p++;
@@ -238,12 +239,14 @@ int create_users(char *username, char *password, char *root_password) {
     }
 
     password[strcspn(password, "\n")] = '\0';
+    sanitize_input(password);
     if (password[0] == '\0') {
         strcpy(password, "redrose");
     }
 
     mkdir("/mnt/root", 0755);
     root_password[strcspn(root_password, "\n")] = '\0';
+    sanitize_input(root_password);
     if (root_password[0] == '\0') {
         strcpy(root_password, "redrose");
     }
