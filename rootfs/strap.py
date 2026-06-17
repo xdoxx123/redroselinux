@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 
 import fix_usr_local
 
@@ -12,14 +13,49 @@ Prints an error message and exits 1 if package is not found.
 On success, prints the version of the package and adds it to rootfs/filesystem/etc/repro.car, then exits 0.
 """
 
+
+def exec(command, shell=True, capture=False, exit_on_error=True):
+    """
+    Execute a command with subprocess.
+
+    Args:
+        command: Command string or list
+        shell: Run through shell if True (default True)
+        capture: Return output if True, else print to stdout/stderr (default False)
+        exit_on_error: Exit on non-zero return code (default True)
+
+    Returns:
+        CompletedProcess object if capture=True, else None
+    """
+    try:
+        result = subprocess.run(command, shell=shell, capture_output=capture, text=True)
+
+        if result.returncode != 0:
+            if capture:
+                print(result.stderr or result.stdout, file=sys.stderr)
+            if exit_on_error:
+                sys.exit(result.returncode)
+
+        if capture:
+            return result
+
+        return result.returncode
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        if exit_on_error:
+            sys.exit(1)
+        return None
+
+
 packagelist = ""
 try:
     packagelist = open("/etc/car/packagelist", "r").read()
-except:
+except FileNotFoundError, OSError, IOError:
     print("  => Car not initialized, updating packagelist...")
     if (
-        os.system(
-            "sudo mkdir -p /etc/car && sudo curl -# -L -o /etc/car/packagelist https://github.com/redroselinux/car3-pkgs/raw/refs/heads/main/README"
+        exec(
+            "sudo mkdir -p /etc/carsudo curl -# -L -o /etc/car/packagelist https://github.com/redroselinux/car3-pkgs/raw/refs/heads/main/README",
+            shell=True,
         )
         != 0
     ):
@@ -28,7 +64,7 @@ except:
     else:
         try:
             packagelist = open("/etc/car/packagelist", "r").read()
-        except:
+        except Exception:
             print("  => Still failed to read packagelist")
             exit(1)
 
@@ -54,9 +90,12 @@ if ":" in package:
         package = parts[1]
         print(f"=> Uninstalling {package}")
 
+        if len(parts) == 3:
+            install_to = parts[2]
+
         # read the save file
         save = ""
-        with open(f"rootfs/filesystem/etc/car/saves/{package}", "r") as f:
+        with open(f"{install_to}/etc/car/saves/{package}", "r") as f:
             save = f.read()
 
         # delete all the files
@@ -64,7 +103,7 @@ if ":" in package:
             if line == "car":
                 continue  # skip file already deleted
 
-            file_to_delete = "rootfs/filesystem/" + line
+            file_to_delete = f"{install_to}/{line}"
             os.remove(file_to_delete)
         exit()
 
@@ -86,15 +125,15 @@ for i in packagelist.splitlines():
         tarball = "strap_packages/" + package + ".tar.zst"
         if not os.path.exists(tarball):
             print("  -> " + tarball)
-            os.system("curl -# -L -o " + tarball + " " + url)
+            exec("curl -# -L -o " + tarball + " " + url)
 
         if recompress:
             print("  ==> Recompressing " + package)
-            os.system(f"zstd -d {tarball} -o /tmp/{package}.tar --force")
+            exec(f"zstd -d {tarball} -o /tmp/{package}.tar --force")
             print("  ==> Decompressed .zst to .tar")
-            os.system(f"gzip -f /tmp/{package}.tar")
+            exec(f"gzip -f /tmp/{package}.tar")
             print("  -> " + install_to + "/" + package + ".tar.gz")
-            os.system(f"mv /tmp/{package}.tar.gz {install_to}/{package}.tar.gz")
+            exec(f"mv /tmp/{package}.tar.gz {install_to}/{package}.tar.gz")
             exit(0)
 
         save_path = install_to + "/etc/car/saves/" + package
@@ -109,11 +148,11 @@ for i in packagelist.splitlines():
             exit(1)
         if compress:
             print("  ==> Compressing " + package)
-            os.system(f"tar -cf /tmp/{package}.tar -C {install_to} .")
-            os.system(f"gzip -f /tmp/{package}.tar")
+            exec(f"tar -cf /tmp/{package}.tar -C {install_to} .")
+            exec(f"gzip -f /tmp/{package}.tar")
             print("  -> " + install_to + "/" + package + ".tar.gz")
-            os.system(f"mv /tmp/{package}.tar.gz {install_to}/{package}.tar.gz")
-            os.system(f"rm -rf {install_to}/usr")
+            exec(f"mv /tmp/{package}.tar.gz {install_to}/{package}.tar.gz")
+            os.removedirs(f"rm -rf {install_to}/usr")
 
     elif currently_at_package:
         if i.startswith("version "):
@@ -126,4 +165,4 @@ if not currently_at_package:
     print("  ==> Package not found")
     exit(1)
 
-os.system(f"rm -f {install_to}/car")
+os.remove(f"{install_to}/car")
