@@ -13,7 +13,7 @@ FEDORA := $(shell grep -q 'ID=fedora' /etc/os-release 2>/dev/null && echo 1 || e
 
 GRUB := $(shell command -v grub2-mkrescue >/dev/null 2>&1 && echo grub2-mkrescue || echo grub-mkrescue)
 
-all: dep clean installer install-packages strip-bins squash-root initramfs iso vm
+all: dep clean installer install-packages squash-root initramfs iso vm
 no-vm: dep clean installer squash-root initramfs iso
 
 help:
@@ -28,7 +28,7 @@ dep:
 	@mkdir -p $(ROOTFS_FS_DIR)/usr/lib/grub
 	@cp -p /lib64/ld-linux-x86-64.so.2 $(ROOTFS_FS_DIR)/lib64/
 	@if [ "$(FEDORA)" = "1" ]; then \
-		cmd_list="grub2-mkrescue curl bash gzip gcc qemu-img qemu-system-x86_64 python3 cpio fakeroot xorriso strip file"; \
+		cmd_list="grub2-mkrescue curl bash gzip gcc qemu-img qemu-system-x86_64 python3 cpio fakeroot xorriso file"; \
 	else \
 		cmd_list="grub-mkrescue curl bash gzip gcc qemu-img qemu-system-x86_64 python3 cpio fakeroot xorriso"; \
 	fi; \
@@ -72,16 +72,6 @@ initramfs: dep squash-root
 	@cd $(INITRAMFS_DIR) && find . -print0 | cpio --null -o -H newc > ../$(INITRAMFS_CPIO)
 	@gzip -f $(INITRAMFS_CPIO)
 	@echo "  -> $(INITRAMFS_GZ)"
-
-strip-bins: dep install-packages
-	@echo "==> Stripping binaries..."
-	@find $(ROOTFS_FS_DIR)/bin $(ROOTFS_FS_DIR)/*/bin $(ROOTFS_FS_DIR)/*/lib* -type f -exec file {} \; | \
-	grep -E 'ELF .* (executable|shared object)' | \
-	cut -d: -f1 | \
-	while read -r f; do \
-		echo "  => $$f"; \
-		strip --strip-unneeded "$$f" || true; \
-	done
 
 install-packages: dep
 	@echo "==> Installing packages..."
@@ -167,7 +157,6 @@ clean-all: clean clean-downloads
 bare-build: installer squash-root initramfs iso
 no-clean: installer squash-root initramfs iso vm
 short-build: installer squash-root initramfs iso vm
-no-strip: dep clean installer install-packages strip-bins squash-root initramfs iso vm
 
 installed-vm: $(QCOW2_IMG)
 	@echo "=> Starting VM from disk..."
