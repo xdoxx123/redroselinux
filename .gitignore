@@ -38,6 +38,12 @@ rootfs/filesystem/lib*
 rootfs/filesystem/var
 rootfs/filesystem/etc/nullinitrd
 rootfs/filesystem/etc/redrose-strap
+initramfs/etc
+initramfs/include
+initramfs/lib
+initramfs/sbin
+initramfs/usr
+initramfs/share
 
 # python
 *__pycache__

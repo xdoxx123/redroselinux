@@ -213,7 +213,7 @@ int makefs(char* drive) {
     if (system(command) != 0)
         return 1;
 
-    snprintf(command, sizeof(command), "busybox mke2fs -F %s", root_part);
+    snprintf(command, sizeof(command), "/sbin/mkfs.ext4 -F %s", root_part);
     printf("> %s\n", command);
     fflush(stdout);
     return system(command);
@@ -222,7 +222,7 @@ int makefs(char* drive) {
 /* Mounts the installation drive and copies the root files to there. */
 int copy_root(char* drive) {
     printf("  Mounting %s\n", get_partition(drive, 3));
-    if (mount(get_partition(drive, 3), "/mnt", "ext2", 0, 0) != 0) {
+    if (mount(get_partition(drive, 3), "/mnt", "ext4", 0, 0) != 0) {
         perror("mount");
         return 1;
     }

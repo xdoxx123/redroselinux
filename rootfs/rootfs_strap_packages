@@ -63,3 +63,6 @@ coreutils:initramfs/coreutils-gnu:recompress
 findutils:initramfs/coreutils-gnu:recompress
 uu-coreutils:initramfs/coreutils-uutils:recompress
 uu-findutils:initramfs/coreutils-uutils:recompress
+
+-- installer tools
+installer.static-e2fsprogs:initramfs/
