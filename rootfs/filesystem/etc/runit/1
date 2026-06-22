@@ -3,7 +3,7 @@
 mount_failed=0
 
 mkdir -p /proc /dev /sys
-echo -e "\e[97m=>\e[0m Mounting pseudo-filesystems"
+echo -e "\e[94m::\e[0m Mounting pseudo-filesystems"
 echo -e " \e[94m*\e[0m /proc [proc]"
 mount -t proc proc /proc || mount_failed=1
 echo -e " \e[94m*\e[0m /dev [devtmpfs]"
@@ -25,8 +25,6 @@ if [ "$mount_failed" -eq 1 ]; then
   echo "  * Starting a rescue shell"
   exec /bin/sh
 fi
-
-echo -e "\e[92m*\e[0m Succesfully mounted pseudo-filesystems"
 
 chmod +x /etc/runit/2
 exec /etc/runit/2
