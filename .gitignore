@@ -31,6 +31,7 @@ rootfs/filesystem/etc/dbus*
 rootfs/filesystem/etc/rpc
 rootfs/filesystem/etc/slsh.rc
 rootfs/filesystem/etc/ld.so.cache
+rootfs/filesystem/etc/cron.d/*
 rootfs/filesystem/usr/*
 rootfs/filesystem/*bin
 !rootfs/filesystem/usr/sbin/hostname-reload-daemon
@@ -38,6 +39,7 @@ rootfs/filesystem/lib*
 rootfs/filesystem/var
 rootfs/filesystem/etc/nullinitrd
 rootfs/filesystem/etc/redrose-strap
+!rootfs/filesystem/usr/share/dbus-1/system.d/net.connman.iwd.conf
 initramfs/etc
 initramfs/include
 initramfs/lib
@@ -47,3 +49,6 @@ initramfs/share
 
 # python
 *__pycache__
+
+# some stuff ive been working on lately
+src/new-installer/
