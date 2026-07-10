@@ -12,6 +12,7 @@
 acl
 attr
 binutils
+ca-certificates
 curl
 dbus
 e2fsprogs
