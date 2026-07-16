@@ -46,6 +46,7 @@ initramfs/lib
 initramfs/sbin
 initramfs/usr
 initramfs/share
+rootfs/filesystem/etc/ssl/
 
 # python
 *__pycache__

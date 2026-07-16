@@ -4,10 +4,15 @@ INITRAMFS_DIR = initramfs
 OUTPUT_DIR = .
 ROOTFS_FS_DIR = $(ROOTFS_DIR)/$(FS_DIR)
 
-INITRAMFS_CPIO = $(OUTPUT_DIR)/initramfs.cpio
-INITRAMFS_GZ = $(OUTPUT_DIR)/initramfs.cpio.gz
-ISO = $(OUTPUT_DIR)/redrose_linux.iso
-QCOW2_IMG = redrose_linux.qcow2
+GZIP_PATH := gzip
+GZIP_PLAIN_COMMAND := $(word 1,$(GZIP_PATH))
+CC := gcc
+CCFLAGS :=
+
+INITRAMFS_CPIO := $(OUTPUT_DIR)/initramfs.cpio
+INITRAMFS_GZ := $(OUTPUT_DIR)/initramfs.cpio.gz
+ISO := $(OUTPUT_DIR)/redrose_linux.iso
+QCOW2_IMG := redrose_linux.qcow2
 
 FEDORA := $(shell grep -q 'ID=fedora' /etc/os-release 2>/dev/null && echo 1 || echo 0)
 
@@ -28,9 +33,9 @@ dep:
 	@mkdir -p $(ROOTFS_FS_DIR)/usr/lib/grub
 	@cp -p /lib64/ld-linux-x86-64.so.2 $(ROOTFS_FS_DIR)/lib64/
 	@if [ "$(FEDORA)" = "1" ]; then \
-		cmd_list="grub2-mkrescue curl bash gzip gcc qemu-img qemu-system-x86_64 python3 cpio fakeroot xorriso file"; \
+		cmd_list="grub2-mkrescue curl bash $(GZIP_PLAIN_COMMAND) $(CC) qemu-img qemu-system-x86_64 python3 cpio fakeroot xorriso file"; \
 	else \
-		cmd_list="grub-mkrescue curl bash gzip gcc qemu-img qemu-system-x86_64 python3 cpio fakeroot xorriso"; \
+		cmd_list="grub-mkrescue curl bash $(GZIP_PLAIN_COMMAND) $(CC) qemu-img qemu-system-x86_64 python3 cpio fakeroot xorriso"; \
 	fi; \
 	for cmd in $$cmd_list; do \
 		if command -v $$cmd >/dev/null 2>&1; then \
@@ -117,7 +122,7 @@ squash-root: dep
 	@echo "  ==> Creating uncompressed rootfs.tar"
 	@fakeroot tar -cpf $(INITRAMFS_DIR)/rootfs.tar -C $(ROOTFS_DIR) $(FS_DIR)
 	@echo "  ==> Compressing rootfs.tar"
-	@gzip -f $(INITRAMFS_DIR)/rootfs.tar
+	@$(GZIP_PATH) -f $(INITRAMFS_DIR)/rootfs.tar
 	@rm -f $(INITRAMFS_DIR)/rootfs.tar
 	@echo "  -> $(INITRAMFS_DIR)/rootfs.tar.gz"
 
@@ -130,14 +135,14 @@ iso: squash-root initramfs
 	@echo "  -> $(ISO)"
 
 installer: dep
-	@$(CC) src/installer/main.c src/installer/tui.c src/installer/backend.c -o $(INITRAMFS_DIR)/bin/install -static 2>&1
+	@$(CC) src/installer/main.c src/installer/tui.c src/installer/backend.c $(CCFLAGS) -o $(INITRAMFS_DIR)/bin/install -static 2>&1
 	@echo "  -> $(INITRAMFS_DIR)/bin/install"
-	@test -f src/welcome/main.c && $(CC) src/welcome/main.c -o $(ROOTFS_FS_DIR)/bin/welcome && echo "  -> $(ROOTFS_FS_DIR)/bin/welcome" || true
 
 run-installer:
 	@echo "=> Running installer..."
 	$(INITRAMFS_DIR)/bin/install
 
+# an ancient piece of old redrose shit
 clean:
 	@echo "=> Cleaning..."
 	@rm -f $(ROOTFS_FS_DIR)/etc/repro.car
