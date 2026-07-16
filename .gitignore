@@ -23,6 +23,8 @@ rootfs/filesystem/etc/repro.car
 rootfs/filesystem/etc/car/saves
 initramfs/bin
 initramfs/coreutils*
+rootfs/filesystem/etc/car/
+
 
 # package files
 rootfs/filesystem/etc/sv/dbus

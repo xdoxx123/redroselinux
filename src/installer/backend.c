@@ -328,21 +328,6 @@ int install_grub(char* drive) {
     return system(command);
 }
 
-/* Enables propriertary software repo in car.
- * Official car docs:
- *   * https://docs.redroselinux.org/#/car?id=listup
- * Additional information:
- *   * https://docs.redroselinux.org/#/fhs?id=car_propiertarylock */
-int propriertary_(char*) {
-    FILE *file = fopen("/mnt/etc/car_propiertary.lock", "w");
-    if (file == NULL) {
-        printf("Enabling propriertary software failed");
-        return 1;
-    }
-    fclose(file);
-    return 0;
-}
-
 /* Sanitizes and sets the hostname of the newly installed system.
  * Writes to /etc/hostname; init sets it in /proc automatically.
  * * rootfs/filesystem/sbin/init */
@@ -414,13 +399,8 @@ int localhost(char *name) {
     return 0;
 }
 
-/* Initialize car. Since we do not have an internet connection, expect failure.
- * Todo: intergrate this a little better? */
 int init_car(char*) {
-    set_text_color(YELLOW);
-    printf("THIS IS SUPPOSED TO FAIL. DO NOT MIND THE ERROR MESSAGES.\n");
-    set_text_color(RESET);
-    system("busybox yes 1 | busybox chroot /mnt /bin/sh -c '/bin/car init'");
+    system("busybox chroot /mnt /bin/sh -c '/bin/car installer-init'");
     return 0;
 }
 

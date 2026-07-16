@@ -118,6 +118,8 @@ squash-root: dep
 	@mkdir -p $(ROOTFS_FS_DIR)/usr/lib/grub
 	@echo "=> Running ldconfig"
 	@ldconfig -r rootfs/filesystem
+	@echo "=> Fetching RepoMirrors"
+	@curl --progress-bar -Lo $(ROOTFS_FS_DIR)/etc/car/Bootstrap-RepoMirror https://github.com/redroselinux/car/raw/refs/heads/main/RepoMirrors
 	@echo "=> Creating rootfs tgz..."
 	@echo "  ==> Creating uncompressed rootfs.tar"
 	@fakeroot tar -cpf $(INITRAMFS_DIR)/rootfs.tar -C $(ROOTFS_DIR) $(FS_DIR)

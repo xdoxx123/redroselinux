@@ -117,7 +117,6 @@ int main() {
     }
 
     char* host_name = hostname();
-    int propriertary = proprietary_enable();
     enter_continue();
 
     // Ask for confirmation
@@ -152,8 +151,6 @@ int main() {
             }
         }
         if (success && run_installation_step(install_grub, drive, "Installing GRUB!", 1) < 0) success = 0;
-        if (success && propriertary == 0)
-            if (run_installation_step(propriertary_,                     "",        "Enabling propriertary software!", 0) < 0)   success = 0;
         if (success && run_installation_step(localhost,                  host_name, "Setting hostname!", 0) < 0)                 success = 0;
         if (success && run_installation_step(init_car,                   "",        "Initializing Car!", 0) < 0)                 success = 0;
         if (success && run_installation_step(regenerate_initramfs_fstab, "",        "Regenerating initramfs and fstab!", 1) < 0) success = 0;

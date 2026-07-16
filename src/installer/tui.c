@@ -490,16 +490,6 @@ char* hostname(void) {
     return password;
 }
 
-int proprietary_enable(void) {
-    char input[4];
-    printf("BTW, enable proprietary software? (y/n) [n]: ");
-    fgets(input, sizeof(input), stdin);
-    if (input[0] == 'y' || input[0] == 'Y') {
-        return 0;
-    }
-    return 1;
-}
-
 void installing_header(void) {
     printf("step 5/6");
     set_text_color(RED);
