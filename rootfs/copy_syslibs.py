@@ -8,8 +8,7 @@ os.system("cp /usr/sbin/grub-install rootfs/filesystem/bin/")
 if not os.path.exists("libcp"):
     print("=> Downloading libcp...")
     os.system(
-        "curl -# -L -o libcp"
-        "https://github.com/redroselinux/libcp/releases/download/v0.1/libcp"
+        "curl -# -L -o libcp https://github.com/redroselinux/libcp/releases/download/v0.1/libcp"
     )
     os.system("chmod +x libcp")
 else:
