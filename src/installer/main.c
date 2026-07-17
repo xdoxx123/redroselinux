@@ -5,6 +5,9 @@
 #include "tui.h"
 #include "backend.h"
 
+/*
+    TODO: Rewrite this horrible piece of shitty code with memory leaks.
+*/
 
 void shutdown_computer() {
     sync(); reboot(RB_AUTOBOOT);
