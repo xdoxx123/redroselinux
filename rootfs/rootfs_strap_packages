@@ -26,11 +26,14 @@ groff
 ireallyloverunit
 iwd
 kmod
+less
 libcap
 libffi
+libpsl
 libslang
 libidn
 libidn2
+libunistring
 linux
 linux:filesystem/
 lz4
