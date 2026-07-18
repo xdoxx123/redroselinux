@@ -1,3 +1,5 @@
-with open("src/installer/installer.h") as f:
+with open("src/installer/installer.h", "r+") as f:
     lines = [l if not l.startswith("#define DEBUG") else "#define DEBUG 1\n" for l in f]
-open("src/installer/common.h", "w").writelines(lines)
+    f.seek(0)
+    f.writelines(lines)
+    f.truncate()
