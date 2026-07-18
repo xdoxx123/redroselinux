@@ -140,7 +140,7 @@ int main() {
         if (FAIL_DEBUG == 1)
             if (run_installation_step(fail, "", "FAIL_DEBUG is on!", 1) < 0) success = 0;
         if (success && run_installation_step(wipe_drive,   drive, "Erasing the drive!", 1) < 0)    success = 0;
-        if (success && run_installation_step(makefs,       drive, "Making filesystems!", 1) < 0)   success = 0;
+        if (success && run_installation_step(makefs,       drive, "Making partitions and filesystems!", 1) < 0) success = 0;
         if (success && run_installation_step(copy_root,    drive, "Copying root!", 1) < 0)         success = 0;
         if (success && run_installation_step(install_utils, "",   "Installing utilities!", 0) < 0) success = 0;
         if (success) {
