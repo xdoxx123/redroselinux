@@ -12,8 +12,10 @@
 acl
 attr
 binutils
+brotli
 ca-certificates
 curl
+cyrus-sasl
 dbus
 e2fsprogs
 expat
