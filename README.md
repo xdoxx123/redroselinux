@@ -10,7 +10,7 @@ An independent x86_64 systemd-free EU-based Linux distribution.
 
 Have you ever found yourself using confusing distributions? Redrose Linux takes features from NixOS and Arch (mainly) and turns them into an easy-to-use independent systemd-free system just for developers. 
 
-We currently use the runit init system (which we customized) and the nullinitrd initramfs generator (from NULL GNU/Linux). This might change in the future.
+We currently use the runit init system (which we customized) and the nullinitrd initramfs generator (originally from NULL GNU/Linux). This might change in the future.
 
 >[!CAUTION]
 > Redrose Linux is under active development and is **not ready for daily use**.
