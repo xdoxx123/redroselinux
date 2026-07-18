@@ -52,9 +52,10 @@ try:
     packagelist = open("/etc/car/packagelist", "r").read()
 except FileNotFoundError, OSError, IOError:
     print("  => Car not initialized, updating packagelist...")
+    escalate = os.getenv("ESCALATE_PROG", "sudo")
     if (
         exec(
-            "sudo mkdir -p /etc/carsudo curl -# -L -o /etc/car/packagelist https://github.com/redroselinux/car3-pkgs/raw/refs/heads/main/README",
+            f"{escalate} mkdir -p /etc/car && {escalate} curl -# -L -o /etc/car/packagelist https://github.com/redroselinux/car3-pkgs/raw/refs/heads/main/README",
             shell=True,
         )
         != 0
@@ -131,7 +132,7 @@ for i in packagelist.splitlines():
             print("  ==> Recompressing " + package)
             exec(f"zstd -d {tarball} -o /tmp/{package}.tar --force")
             print("  ==> Decompressed .zst to .tar")
-            exec(f"gzip -f /tmp/{package}.tar")
+            exec(f"{os.getenv("GZIP_PATH", "gzip")} -f /tmp/{package}.tar")
             print("  -> " + install_to + "/" + package + ".tar.gz")
             exec(f"mv /tmp/{package}.tar.gz {install_to}/{package}.tar.gz")
             exit(0)
@@ -149,7 +150,7 @@ for i in packagelist.splitlines():
         if compress:
             print("  ==> Compressing " + package)
             exec(f"tar -cf /tmp/{package}.tar -C {install_to} .")
-            exec(f"gzip -f /tmp/{package}.tar")
+            exec(f"{os.getenv("GZIP_PATH", "gzip")} -f /tmp/{package}.tar")
             print("  -> " + install_to + "/" + package + ".tar.gz")
             exec(f"mv /tmp/{package}.tar.gz {install_to}/{package}.tar.gz")
             os.removedirs(f"rm -rf {install_to}/usr")
@@ -162,7 +163,7 @@ for i in packagelist.splitlines():
         break
 
 if not currently_at_package:
-    print("  ==> Package not found")
+    print(f"=x Package {package} not found")
     exit(1)
 
 os.remove(f"{install_to}/car")

@@ -400,7 +400,24 @@ int localhost(char *name) {
 }
 
 int init_car(char*) {
+    char buf[8];
+    enable_echo();
+    fputs("Do you want to disable sha256 checks? [y/N] ", stdout);
+    if (fgets(buf, sizeof(buf), stdin)) {
+        if (buf[0] == 'Y' || buf[0] == 'y') {
+        } else {
+            FILE* fptr = fopen("/mnt/etc/car/sha256-enable", "w");
+            if (!fptr) {
+                puts("failed to open stream");
+                return 1;
+            }
+            fputs("", fptr);
+            fclose(fptr);
+        }
+    }
+    puts("");
     system("busybox chroot /mnt /bin/sh -c '/bin/car installer-init'");
+    disable_echo();
     return 0;
 }
 
