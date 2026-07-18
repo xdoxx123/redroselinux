@@ -122,6 +122,9 @@ squash-root: dep
 	@curl --progress-bar -Lo $(ROOTFS_FS_DIR)/etc/car/Bootstrap-RepoMirror https://github.com/redroselinux/car/raw/refs/heads/main/RepoMirrors
 	@echo "=> Creating /var/cache"
 	@mkdir -p $(ROOTFS_FS_DIR)/var/cache
+	@echo "=> Installing redrose-known-issues"
+	@cp src/known-issues-reader/main.sh $(ROOTFS_FS_DIR)/usr/bin/redrose-known-issues
+	@chmod +x $(ROOTFS_FS_DIR)/usr/bin/redrose-known-issues
 	@echo "=> Creating rootfs tgz..."
 	@echo "  ==> Creating uncompressed rootfs.tar"
 	@fakeroot tar -cpf $(INITRAMFS_DIR)/rootfs.tar -C $(ROOTFS_DIR) $(FS_DIR)
