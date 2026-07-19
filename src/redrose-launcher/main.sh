@@ -73,7 +73,7 @@ if [ "$answer" = "" ]; then
     download_url $url $name
 elif [[ "$answer" =~ ^[0-9]+$ ]] && [ "$answer" -le $((index)) ] && [ "$answer" -gt 0 ]; then
 
-    url=$(echo "$res" | jq -r '.[$((answer - 1))].assets[] | select(.name | endswith(".iso")) | .browser_download_url' | head -n 1)
+    url=$(echo "$res" | jq -r ".[$((answer - 1))].assets[] | select(.name | endswith(\".iso\")) | .browser_download_url" | head -n 1)
     name=$(echo "$res" | jq -r ".[$((answer - 1))].tag_name")
     download_url $url $name
 else
